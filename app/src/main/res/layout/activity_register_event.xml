@@ -189,64 +189,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:chipSpacingHorizontal="8dp"
-            app:singleSelection="false"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_art"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/art" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_nature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/nature" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_photography"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/photography" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_travel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/travel" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_music"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/music" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_movies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/movies" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_food"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/food" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_sports"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sports" />
-
-        </com.google.android.material.chip.ChipGroup>
-
         <Button
             android:id="@+id/create_event_button"
             android:layout_width="wrap_content"

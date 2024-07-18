@@ -10,6 +10,25 @@
       "client_info": {
         "mobilesdk_app_id": "1:962218685688:android:9c5250fb9846ab380bf70d",
         "android_client_info": {
+          "package_name": "edu.northeastern.numad24su_group9a6"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrmdXiBu7Lo6v4L4-zeGqCuBgR4mW6kIg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962218685688:android:dbaf3686ed34b1d90bf70d",
+        "android_client_info": {
           "package_name": "org.kulkarni_sampada.neuquest"
         }
       },

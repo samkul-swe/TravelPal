@@ -20,8 +20,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,11 +29,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -48,14 +45,12 @@ public class RegisterEventActivity extends AppCompatActivity {
     private EditText eventNameEditText, eventDescriptionEditText, eventPriceEditText, eventLocationEditText, eventRegisterLinkEditText;
     private TextInputEditText eventStartTimeEditText, eventEndTimeEditText, eventStartDateEditText, eventEndDateEditText;
     private ImageView imageView;
-    private ChipGroup relatedTags;
-    private String eventTitle, eventDescription, eventPrice, eventLocation, eventStartTime, eventEndTime, eventStartDate, eventEndDate, eventRegisterLink, eventImage, eventRelatedTags, uid;
+    private String eventTitle, eventDescription, eventPrice, eventLocation, eventStartTime, eventEndTime, eventStartDate, eventEndDate, eventRegisterLink, eventImage, uid;
 
     private DatabaseReference firebaseDatabase, eventRef;
     private StorageReference storageReference;
 
     private Map<String, Object> eventData;
-    List<String> selectedTags;
     private boolean eventSaved = false;
 
     private Uri imageUri;
@@ -85,7 +80,6 @@ public class RegisterEventActivity extends AppCompatActivity {
         eventEndDateEditText = findViewById(R.id.event_end_date_edittext);
         eventRegisterLinkEditText = findViewById(R.id.event_register_link_edittext);
         imageView = findViewById(R.id.imageView);
-        relatedTags = findViewById(R.id.chipGroup);
         Button buttonSelectImage = findViewById(R.id.buttonSelectImage);
         Button createEventButton = findViewById(R.id.create_event_button);
 
@@ -94,14 +88,6 @@ public class RegisterEventActivity extends AppCompatActivity {
         eventStartTimeEditText.setOnClickListener(v -> showTimePicker(eventStartTimeEditText));
         eventEndDateEditText.setOnClickListener(v -> showDatePicker(eventEndDateEditText));
         eventEndTimeEditText.setOnClickListener(v -> showTimePicker(eventEndTimeEditText));
-
-        // Get related tags for this event
-        selectedTags = new ArrayList<>();
-        for (int id : relatedTags.getCheckedChipIds()) {
-            Chip chip = relatedTags.findViewById(id);
-            selectedTags.add(chip.getText().toString());
-        }
-
 
         launcher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -136,17 +122,9 @@ public class RegisterEventActivity extends AppCompatActivity {
         eventEndDate = Objects.requireNonNull(eventEndDateEditText.getText()).toString();
         eventRegisterLink = eventRegisterLinkEditText.getText().toString();
 
-        StringBuilder relatedTagsString = new StringBuilder();
-        for (String tag : selectedTags) {
-            relatedTagsString.append(tag).append(", ");
-        }
-        relatedTagsString.setLength(relatedTagsString.length() - 2); // remove the last ", "
-
-        eventRelatedTags = relatedTagsString.toString();
-
         // Create a new thread to execute the first method
         Thread eventThread = new Thread(() -> {
-            boolean imageUploaded = false;
+            boolean imageUploaded;
             try {
                 imageUploaded = uploadImageToFirebase();
             } catch (InterruptedException e) {
@@ -237,7 +215,7 @@ public class RegisterEventActivity extends AppCompatActivity {
         StorageReference fileReference = storageReference.child(UUID.randomUUID().toString());
 
         // Upload the file to Firebase Storage
-        StorageTask uploadTask = fileReference.putFile(imageUri)
+        StorageTask<UploadTask.TaskSnapshot> uploadTask = fileReference.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Handle the successful upload
                     Toast.makeText(RegisterEventActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
@@ -304,7 +282,6 @@ public class RegisterEventActivity extends AppCompatActivity {
         eventData.put("location", eventLocation);
         eventData.put("image", eventImage);
         eventData.put("registerLink", eventRegisterLink);
-        eventData.put("tags", eventRelatedTags);
         eventData.put("createdBy", uid);
         return eventData;
     }

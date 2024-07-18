@@ -17,7 +17,7 @@ public class Event implements Serializable {
     private String price;
     private String location;
     private String registerLink;
-    private String image;
+    private final String image;
 
     public Event(String title, String description, String image) {
         this.title = title;
