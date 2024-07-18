@@ -1,3 +1,35 @@
 <resources>
     <string name="app_name">NEUQuest</string>
+    <string name="welcome_to_neuquest">Welcome to NEUQuest!</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="login">Login</string>
+    <string name="enter_name">Name</string>
+    <string name="enter_email">Email ID</string>
+    <string name="enter_password">Password</string>
+    <string name="select_your_interests">Select your interests</string>
+    <string name="save">Save</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="event_price">Price</string>
+    <string name="event_location">Location</string>
+    <string name="add">Add</string>
+    <string name="event_register_link">Register Link</string>
+    <string name="create_event">Create Event</string>
+    <string name="event_description">Description</string>
+    <string name="selected_image">Selected Image</string>
+    <string name="select_image">Select Image</string>
+    <string name="art">Art</string>
+    <string name="nature">Nature</string>
+    <string name="photography">Photography</string>
+    <string name="travel">Travel</string>
+    <string name="music">Music</string>
+    <string name="movies">Movies</string>
+    <string name="food">Food</string>
+    <string name="sports">Sports</string>
+    <string name="right_now">Right Now</string>
+    <string name="explore">Explore</string>
+    <string name="register_event">Register Event</string>
+    <string name="item_image">Image</string>
 </resources>
