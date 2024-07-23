@@ -36,4 +36,13 @@
         android:text="@string/register_event"
         tools:ignore="VisualLintButtonSize" />
 
+    <Button
+        android:id="@+id/plan_a_trip"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/plan_a_trip"
+        tools:ignore="VisualLintButtonSize" />
+
 </LinearLayout>

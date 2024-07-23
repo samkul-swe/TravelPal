@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,6 +40,8 @@ public class ExploreActivity extends AppCompatActivity {
         Button rightNowButton = findViewById(R.id.right_now);
         Button exploreButton = findViewById(R.id.explore);
         Button registerEventButton = findViewById(R.id.register_event);
+        Button planATripButton = findViewById(R.id.plan_a_trip);
+        FloatingActionButton userProfile = findViewById(R.id.fabUserProfile);
 
         // Set click listeners for the buttons
         exploreButton.setEnabled(false);
@@ -53,6 +56,18 @@ public class ExploreActivity extends AppCompatActivity {
             Intent intent = new Intent(ExploreActivity.this, RegisterEventActivity.class);
             startActivity(intent);
             finish();
+        });
+
+        planATripButton.setOnClickListener(v -> {
+            Intent intent = new Intent(ExploreActivity.this, PlanningTripActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        userProfile.setOnClickListener(v -> {
+            // Handle the click event for the FAB
+            // For example, you could navigate to an "Edit Profile" screen
+            startActivity(new Intent(ExploreActivity.this, UserProfileActivity.class));
         });
 
         // Fetch the data from the database

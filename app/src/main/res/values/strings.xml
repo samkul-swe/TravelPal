@@ -32,4 +32,21 @@
     <string name="explore">Explore</string>
     <string name="register_event">Register Event</string>
     <string name="item_image">Image</string>
+    <string name="trip_budget">Trip Budget</string>
+    <string name="enter_your_budget">Enter your budget</string>
+    <string name="traveling_as">Traveling As</string>
+    <string name="solo">Solo</string>
+    <string name="group_of_2">Group of 2</string>
+    <string name="group_of_3">Group of 3</string>
+    <string name="budget_includes">Budget Includes</string>
+    <string name="meals">Meals</string>
+    <string name="transport">Transport</string>
+    <string name="submit">Submit</string>
+    <string name="minimumBudget">$0</string>
+    <string name="maximumBudget">$5000</string>
+    <string name="plan_a_trip">Plan a trip</string>
+    <string name="planned_trips">Planned Trips</string>
+    <string name="destination">Destination</string>
+    <string name="duration">Duration</string>
+    <string name="meals_included">Meals Included</string>
 </resources>

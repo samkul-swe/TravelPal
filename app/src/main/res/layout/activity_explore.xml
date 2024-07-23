@@ -5,6 +5,12 @@
     android:orientation="vertical"
     android:background="#FFFFFF">
 
+    <include
+        layout="@layout/user_profile_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#F5F5F5" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"

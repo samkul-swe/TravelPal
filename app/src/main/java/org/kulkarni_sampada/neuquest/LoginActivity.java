@@ -18,6 +18,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText emailEditText;
     private EditText passwordEditText;
     private FirebaseAuth firebaseAuth;
+    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = firebaseAuth.getCurrentUser();
                         assert user != null;
-                        String uid = user.getUid();
+                        uid = user.getUid();
 
                         // Login successful
                         // You can start a new activity or perform any other actions after successful login

@@ -18,6 +18,12 @@
         android:theme="@style/Theme.NEUQuest"
         tools:targetApi="31">
         <activity
+            android:name=".UserProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PlanningTripActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegisterEventActivity"
             android:exported="false" />
         <activity
@@ -30,9 +36,6 @@
             android:name=".RightNowActivity"
             android:exported="false" />
         <activity
-            android:name=".InterestsActivity"
-            android:exported="false" />
-        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
@@ -43,6 +46,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
