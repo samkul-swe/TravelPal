@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +27,7 @@ public class RightNowActivity extends AppCompatActivity {
 
     private DatabaseReference databaseRef;
     private List<Event> eventData;
+    private EventAdapter eventAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class RightNowActivity extends AppCompatActivity {
         // Get a reference to the Firebase Realtime Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         databaseRef = database.getReference("Events");
+        eventAdapter = new EventAdapter();
 
         // Find the buttons
         Button rightNowButton = findViewById(R.id.right_now);
@@ -42,6 +45,7 @@ public class RightNowActivity extends AppCompatActivity {
         Button registerEventButton = findViewById(R.id.register_event);
         Button planATripButton = findViewById(R.id.plan_a_trip);
         FloatingActionButton userProfile = findViewById(R.id.fabUserProfile);
+        SearchView searchView = findViewById(R.id.searchView);
 
         // Set click listeners for the buttons
         rightNowButton.setEnabled(false);
@@ -70,8 +74,36 @@ public class RightNowActivity extends AppCompatActivity {
             startActivity(new Intent(RightNowActivity.this, UserProfileActivity.class));
         });
 
+
+        // Set up the search functionality
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterEvents(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterEvents(newText);
+                return true;
+            }
+        });
+
         // Fetch the data from the database
         fetchDataFromDatabase();
+    }
+
+    private void filterEvents(String query) {
+        // Implement your logic to filter the event items based on the search query
+        List<Event> filteredEvents = new ArrayList<>();
+        for (Event event : eventData) {
+            if (event.getTitle().toLowerCase().contains(query.toLowerCase()) ||
+                    event.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                filteredEvents.add(event);
+            }
+        }
+        eventAdapter.updateData(filteredEvents);
     }
 
     private void fetchDataFromDatabase() {
@@ -108,7 +140,7 @@ public class RightNowActivity extends AppCompatActivity {
     private void updateUI() {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        EventAdapter eventAdapter = new EventAdapter(eventData);
+        eventAdapter.updateData(eventData);
         eventAdapter.setOnItemClickListener((event) -> {
             Intent intent = new Intent(RightNowActivity.this, EventDetailsActivity.class);
             intent.putExtra("event", event);

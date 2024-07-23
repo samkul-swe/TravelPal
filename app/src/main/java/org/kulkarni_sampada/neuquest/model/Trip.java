@@ -1,6 +1,7 @@
 package org.kulkarni_sampada.neuquest.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Trip implements Serializable {
     private String maxBudget;
@@ -8,6 +9,7 @@ public class Trip implements Serializable {
     private String minBudget;
     private String transportIncluded;
     private final long timeStamp;
+    private List<Event> events;
 
     public Trip(long timeStamp) {
         this.timeStamp = timeStamp;
@@ -31,5 +33,9 @@ public class Trip implements Serializable {
 
     public long getTimeStamp(){
         return timeStamp;
+    }
+
+    public List<Event> getEvents() {
+        return events;
     }
 }

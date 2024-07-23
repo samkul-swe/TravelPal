@@ -16,10 +16,12 @@ import org.kulkarni_sampada.neuquest.model.Event;
 import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
-    private final List<Event> events;
+    private List<Event> events;
     private EventAdapter.OnItemClickListener listener;
 
-    public EventAdapter(List<Event> events) {
+    public EventAdapter() {}
+
+    public void updateData(List<Event> events) {
         this.events = events;
     }
 

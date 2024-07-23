@@ -49,4 +49,6 @@
     <string name="destination">Destination</string>
     <string name="duration">Duration</string>
     <string name="meals_included">Meals Included</string>
+    <string name="register">Register</string>
+    <string name="search">Search</string>
 </resources>

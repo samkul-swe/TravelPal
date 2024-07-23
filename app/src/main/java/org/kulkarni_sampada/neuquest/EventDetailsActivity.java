@@ -30,7 +30,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         TextView eventPriceTextView = findViewById(R.id.event_price);
         TextView eventLocationTextView = findViewById(R.id.event_location);
         ImageView eventImageView = findViewById(R.id.event_image);
-        Button addButton = findViewById(R.id.add_button);
+        Button registerButton = findViewById(R.id.register_button);
 
         Event event = (Event) getIntent().getSerializableExtra("event");
 
@@ -49,7 +49,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         Picasso.get().load(event.getImage()).into(eventImageView);
 
         // Set the register button click listener
-        addButton.setOnClickListener(v -> {
+        registerButton.setOnClickListener(v -> {
             // Launch the browser or an in-app registration flow with the registerUrl
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getRegisterLink()));
             startActivity(intent);
