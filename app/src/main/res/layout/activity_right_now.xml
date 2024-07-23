@@ -9,8 +9,6 @@
         layout="@layout/user_profile_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
         android:background="#F5F5F5" />
 
     <androidx.recyclerview.widget.RecyclerView

@@ -13,8 +13,9 @@ import org.kulkarni_sampada.neuquest.model.Trip;
 import java.text.DateFormat;
 import java.util.List;
 
-public class TripAdapter extends RecyclerView.Adapter<TripViewHolder> {
+public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     private final List<Trip> trips;
+    private TripAdapter.OnItemClickListener listener;
 
     public TripAdapter(List<Trip> trips) {
         this.trips = trips;
@@ -22,49 +23,45 @@ public class TripAdapter extends RecyclerView.Adapter<TripViewHolder> {
 
     @NonNull
     @Override
-    public TripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_trip, parent, false);
-        return new TripViewHolder(view);
+        return new ViewHolder(view);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Trip trip);
+    }
+
+    public void setOnItemClickListener(TripAdapter.OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TripViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Trip trip = trips.get(position);
-        holder.bind(trip);
+        holder.tripDateTextView.setText(DateFormat.getDateTimeInstance().format(trip.getTimeStamp()));
+        holder.itemView.setOnClickListener(v -> handleTripClick(trip));
     }
 
     @Override
     public int getItemCount() {
         return trips.size();
     }
-}
 
-class TripViewHolder extends RecyclerView.ViewHolder {
-    private final TextView budgetTextView;
-    private final TextView mealsIncludedTextView;
-    private final TextView transportIncludedTextView;
-    private final TextView tripDateTextView;
-
-    public TripViewHolder(@NonNull View itemView) {
-        super(itemView);
-        tripDateTextView = itemView.findViewById(R.id.tripDateTextView);
-        budgetTextView = itemView.findViewById(R.id.budgetTextView);
-        mealsIncludedTextView = itemView.findViewById(R.id.mealsIncludedTextView);
-        transportIncludedTextView = itemView.findViewById(R.id.transportIncludedTextView);
+    private void handleTripClick(Trip trip) {
+        // Handle the trip click event
+        if (listener != null) {
+            listener.onItemClick(trip);
+        }
     }
 
-    public void bind(Trip trip) {
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView tripDateTextView;
 
-        tripDateTextView.setText( DateFormat.getDateTimeInstance().format(trip.getTimeStamp()));
-
-        budgetTextView.setText(trip.getMinBudget() + " - " + trip.getMaxBudget());
-        if (trip.isMealsIncluded()) {
-            mealsIncludedTextView.setText("Meals included");
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tripDateTextView = itemView.findViewById(R.id.tripDateTextView);
         }
-        if (trip.isTransportIncluded()) {
-            transportIncludedTextView.setText("Transportation included");
-        }
-
     }
 }

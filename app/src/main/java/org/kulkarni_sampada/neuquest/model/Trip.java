@@ -1,17 +1,15 @@
 package org.kulkarni_sampada.neuquest.model;
 
-public class Trip {
+import java.io.Serializable;
+
+public class Trip implements Serializable {
     private String maxBudget;
     private String mealsIncluded;
     private String minBudget;
     private String transportIncluded;
-    private long timeStamp;
+    private final long timeStamp;
 
-    public Trip(String minBudget, String maxBudget, String mealsIncluded, String transportIncluded, long timeStamp) {
-        this.minBudget = minBudget;
-        this.maxBudget = maxBudget;
-        this.mealsIncluded = mealsIncluded;
-        this.transportIncluded = transportIncluded;
+    public Trip(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 
@@ -20,7 +18,7 @@ public class Trip {
     }
 
     public boolean isMealsIncluded() {
-        return Boolean.valueOf(mealsIncluded);
+        return Boolean.parseBoolean(mealsIncluded);
     }
 
     public String getMinBudget() {
@@ -28,7 +26,7 @@ public class Trip {
     }
 
     public boolean isTransportIncluded() {
-        return Boolean.valueOf(transportIncluded);
+        return Boolean.parseBoolean(transportIncluded);
     }
 
     public long getTimeStamp(){

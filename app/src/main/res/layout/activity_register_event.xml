@@ -168,7 +168,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
-                tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
+                tools:ignore="TextContrastCheck,VisualLintTextFieldSize,TouchTargetSizeCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

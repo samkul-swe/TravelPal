@@ -1,10 +1,10 @@
 package org.kulkarni_sampada.neuquest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,15 +21,15 @@ import com.google.firebase.database.ValueEventListener;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class UserProfileActivity extends AppCompatActivity {
 
     private TextView nameTextView;
-    private RecyclerView tripRecyclerView;
 
-    private TripAdapter tripAdapter;
+    private List<Trip> trips;
+    private DatabaseReference userRef;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,50 +37,62 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
 
         nameTextView = findViewById(R.id.nameTextView);
-        tripRecyclerView = findViewById(R.id.tripRecyclerView);
-        tripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Get the current user's ID
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         String uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
 
         // Get a reference to the Firebase Realtime Database
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid);
+        userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid);
 
-        // Attach a listener to get the user data
+        fetchDataFromDatabase();
+    }
+
+    private void fetchDataFromDatabase() {
+        trips = new ArrayList<>();
+
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // Get the user's name
-                String userName = dataSnapshot.child("name").getValue(String.class);
+                userName = snapshot.child("name").getValue(String.class);
 
-                // Get the user's planned trips
-                List<Trip> trips = new ArrayList<>();
-                for (DataSnapshot tripSnapshot : dataSnapshot.child("itinerary").getChildren()) {
+                // Clear the previous data
+                trips.clear();
+
+                // Iterate through the data snapshot and add the user data to the list
+                for (DataSnapshot tripSnapshot : snapshot.child("itinerary").getChildren()) {
                     long timeStamp = Long.parseLong(tripSnapshot.getKey());
-                    String minBudget = (String) tripSnapshot.child("minBudget").getValue();
-                    String maxBudget = (String) tripSnapshot.child("maxBudget").getValue();
-                    String mealsIncluded = (String) tripSnapshot.child("mealsIncluded").getValue();
-                    String transportIncluded = (String) tripSnapshot.child("transportIncluded").getValue();
-
-                    Trip trip = new Trip(minBudget, maxBudget, mealsIncluded, transportIncluded, timeStamp);
-
+                    Trip trip = new Trip(timeStamp);
                     trips.add(trip);
                 }
 
-                // Update the UI
-                nameTextView.setText(userName);
-
-                // Set up the adapter
-                tripAdapter = new TripAdapter(trips);
-                tripRecyclerView.setAdapter(tripAdapter);
+                // Update the UI with the sorted data
+                updateUI();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle any errors
-                Log.e("Error displaying information",databaseError.toString());
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle any errors that occurred while fetching the data
+                Log.e("Firebase", "Error fetching data: " + error.getMessage());
             }
         });
+    }
+
+    private void updateUI() {
+
+        nameTextView.setText(userName);
+
+        // Update the UI
+        RecyclerView tripRecyclerView = findViewById(R.id.tripRecyclerView);
+        tripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        TripAdapter tripAdapter = new TripAdapter(trips);
+        tripAdapter.setOnItemClickListener((trip) -> {
+            Intent intent = new Intent(UserProfileActivity.this, TripDetailsActivity.class);
+            intent.putExtra("trip", trip);
+            startActivity(intent);
+            finish();
+        });
+        tripRecyclerView.setAdapter(tripAdapter);
     }
 }

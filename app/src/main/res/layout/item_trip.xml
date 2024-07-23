@@ -9,28 +9,7 @@
         android:id="@+id/tripDateTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666666"/>
-
-    <TextView
-        android:id="@+id/budgetTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666666"/>
-
-    <TextView
-        android:id="@+id/mealsIncludedTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666666"/>
-
-    <TextView
-        android:id="@+id/transportIncludedTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666666" />
+        android:textColor="#666666"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
 </LinearLayout>
