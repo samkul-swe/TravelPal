@@ -63,7 +63,17 @@ public class UserProfileActivity extends AppCompatActivity {
                 // Iterate through the data snapshot and add the user data to the list
                 for (DataSnapshot tripSnapshot : snapshot.child("itinerary").getChildren()) {
                     long timeStamp = Long.parseLong(tripSnapshot.getKey());
-                    Trip trip = new Trip(timeStamp);
+                    String minBudget = tripSnapshot.child("minBudget").getValue(String.class);
+                    String maxBudget = tripSnapshot.child("maxBudget").getValue(String.class);
+                    String mealsIncluded = tripSnapshot.child("mealsIncluded").getValue(String.class);
+                    String transportIncluded = tripSnapshot.child("transportIncluded").getValue(String.class);
+
+                    List<String> eventIDs = new ArrayList<>();
+                    for (DataSnapshot eventSnapshot : tripSnapshot.child("events").getChildren()) {
+                        eventIDs.add(String.valueOf(eventSnapshot.getValue(long.class)));
+                    }
+
+                    Trip trip = new Trip(timeStamp, minBudget, maxBudget, mealsIncluded, transportIncluded, eventIDs);
                     trips.add(trip);
                 }
 

@@ -18,6 +18,9 @@
         android:theme="@style/Theme.NEUQuest"
         tools:targetApi="31">
         <activity
+            android:name=".AddEventsActivity"
+            android:exported="false" />
+        <activity
             android:name=".TripDetailsActivity"
             android:exported="false" />
         <activity

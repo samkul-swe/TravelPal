@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +28,8 @@ import java.util.Map;
 public class PlanningTripActivity extends AppCompatActivity {
     private RangeSlider budgetRangeSlider;
     private TextView minBudgetTextView, maxBudgetTextView;
+    private EditText eventLocationEditText;
+    private TextInputEditText eventStartTimeEditText, eventEndTimeEditText, eventStartDateEditText, eventEndDateEditText;
     private CheckBox mealsCheckbox, transportCheckbox;
     private Button submitButton;
 
@@ -53,6 +57,11 @@ public class PlanningTripActivity extends AppCompatActivity {
         mealsCheckbox = findViewById(R.id.meals_checkbox);
         transportCheckbox = findViewById(R.id.transport_checkbox);
         submitButton = findViewById(R.id.submit_button);
+        eventLocationEditText = findViewById(R.id.event_location_edittext);
+        eventStartTimeEditText = findViewById(R.id.event_start_time_edittext);
+        eventEndTimeEditText = findViewById(R.id.event_end_time_edittext);
+        eventStartDateEditText = findViewById(R.id.event_start_date_edittext);
+        eventEndDateEditText = findViewById(R.id.event_end_date_edittext);
     }
 
     @SuppressLint("SetTextI18n")

@@ -1,10 +1,10 @@
 package org.kulkarni_sampada.neuquest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,64 +20,56 @@ import com.google.firebase.database.ValueEventListener;
 import org.kulkarni_sampada.neuquest.model.Event;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TripDetailsActivity extends AppCompatActivity {
 
-    private DatabaseReference tripRef;
-    private List<Event> eventData;
+    private DatabaseReference eventRef;
+    private List<Event> events;
     private EventAdapter eventAdapter;
+    private TextView tripNameTextView, tripBudgetTextView, tripPreferencesTextView;
+    private Trip trip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
 
-        Trip trip = (Trip) getIntent().getSerializableExtra("trip");
+        // Get the SharedPreferences instance
+        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
+        String uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
+
+        trip = (Trip) getIntent().getSerializableExtra("trip");
 
         // Get a reference to the Firebase Realtime Database
         assert trip != null;
-        tripRef = FirebaseDatabase.getInstance().getReference("Users").child(uid).child("itinerary").child(String.valueOf(trip.getTimeStamp()));
+        eventRef = FirebaseDatabase.getInstance().getReference("Events");
         eventAdapter = new EventAdapter();
 
-        // Fetch the data from the database
-        fetchDataFromDatabase();
+        // Fetch the events of the trip
+        fetchEvents();
     }
 
-    private void filterEvents(String query) {
-        // Implement your logic to filter the event items based on the search query
-        List<Event> filteredEvents = new ArrayList<>();
-        for (Event event : eventData) {
-            if (event.getTitle().toLowerCase().contains(query.toLowerCase()) ||
-                    event.getDescription().toLowerCase().contains(query.toLowerCase())) {
-                filteredEvents.add(event);
-            }
-        }
-        eventAdapter.updateData(filteredEvents);
-    }
 
-    private void fetchDataFromDatabase() {
-        eventData = new ArrayList<>();
+    private Event getEvent(String eventID) {
 
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        Event event = new Event();
+
+        eventRef.child(eventID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Clear the previous data
-                eventData.clear();
-
-                // Iterate through the data snapshot and add the user data to the list
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    String title = childSnapshot.child("title").getValue(String.class);
-                    String image = childSnapshot.child("image").getValue(String.class);
-                    String description = childSnapshot.child("description").getValue(String.class);
-
-                    Event event = new Event(title, description, image);
-                    eventData.add(event);
-                }
-
-                // Update the UI with the sorted data
-                updateUI();
+                event.setTitle(snapshot.child("title").getValue(String.class));
+                event.setImage(snapshot.child("image").getValue(String.class));
+                event.setDescription(snapshot.child("description").getValue(String.class));
+                event.setStartTime(snapshot.child("startTime").getValue(String.class));
+                event.setStartDate(snapshot.child("startDate").getValue(String.class));
+                event.setEndTime(snapshot.child("endTime").getValue(String.class));
+                event.setEndDate(snapshot.child("endDate").getValue(String.class));
+                event.setPrice(snapshot.child("price").getValue(String.class));
+                event.setLocation(snapshot.child("location").getValue(String.class));
+                event.setRegisterLink(snapshot.child("registerLink").getValue(String.class));
             }
 
             @Override
@@ -86,12 +78,44 @@ public class TripDetailsActivity extends AppCompatActivity {
                 Log.e("Firebase", "Error fetching data: " + error.getMessage());
             }
         });
+
+        return event;
+    }
+
+
+
+    private void fetchEvents() {
+        events = new ArrayList<>();
+
+        for (String eventID : trip.getEventIDs()) {
+            Event event = getEvent(eventID);
+            events.add(event);
+        }
+
+        updateUI();
     }
 
     private void updateUI() {
+
+        tripNameTextView = findViewById(R.id.trip_name);
+        tripBudgetTextView = findViewById(R.id.trip_budget);
+        tripPreferencesTextView = findViewById(R.id.trip_preferences);
+
+        tripNameTextView.setText(DateFormat.getDateTimeInstance().format(trip.getTimeStamp()));
+        tripBudgetTextView.setText("Budget from $" + trip.getMinBudget() + " - $" + trip.getMaxBudget());
+        if (trip.isMealsIncluded() && !trip.isTransportIncluded()) {
+            tripPreferencesTextView.setText("Meal included in budget");
+        } else if (!trip.isMealsIncluded() && trip.isTransportIncluded()) {
+            tripPreferencesTextView.setText("Transportation included in budget");
+        } else if (trip.isMealsIncluded() && trip.isTransportIncluded()) {
+            tripPreferencesTextView.setText("Transportation and meals included in budget");
+        } else if (!trip.isMealsIncluded() && !trip.isTransportIncluded()) {
+            tripPreferencesTextView.setText("Budget only for the trip. No meals or transportation included");
+        }
+
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        eventAdapter.updateData(eventData);
+        eventAdapter.updateData(events);
         eventAdapter.setOnItemClickListener((event) -> {
             Intent intent = new Intent(TripDetailsActivity.this, EventDetailsActivity.class);
             intent.putExtra("event", event);

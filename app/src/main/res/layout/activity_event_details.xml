@@ -179,11 +179,14 @@
                                 android:text="@string/event_location"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
-                            <TextView
+                            <Button
                                 android:id="@+id/event_location"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+                                android:layout_marginTop="16dp"
+                                android:text="@string/show_location"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                tools:ignore="VisualLintButtonSize" />
                         </LinearLayout>
 
                     </LinearLayout>

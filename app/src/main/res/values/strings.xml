@@ -51,4 +51,6 @@
     <string name="meals_included">Meals Included</string>
     <string name="register">Register</string>
     <string name="search">Search</string>
+    <string name="show_location">Show Location</string>
+    <string name="confirm_selection">Confirm Selection</string>
 </resources>

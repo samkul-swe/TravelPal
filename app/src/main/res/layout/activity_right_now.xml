@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:background="#F5F5F5" />
 
-        <androidx.appcompat.widget.SearchView
+        <SearchView
             android:id="@+id/searchView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

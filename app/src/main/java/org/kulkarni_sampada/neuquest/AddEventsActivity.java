@@ -3,11 +3,17 @@ package org.kulkarni_sampada.neuquest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,16 +29,16 @@ import org.kulkarni_sampada.neuquest.model.Event;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExploreActivity extends AppCompatActivity {
+public class AddEventsActivity extends AppCompatActivity {
 
     private DatabaseReference databaseRef;
-    private List<Event> eventData;
+    private List<Event> eventData, selectedEvents;
     private EventAdapter eventAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_right_now);
+        setContentView(R.layout.activity_add_events);
 
         // Get a reference to the Firebase Realtime Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -40,39 +46,7 @@ public class ExploreActivity extends AppCompatActivity {
         eventAdapter = new EventAdapter();
 
         // Find the buttons
-        Button rightNowButton = findViewById(R.id.right_now);
-        Button exploreButton = findViewById(R.id.explore);
-        Button registerEventButton = findViewById(R.id.register_event);
-        Button planATripButton = findViewById(R.id.plan_a_trip);
-        FloatingActionButton userProfile = findViewById(R.id.fabUserProfile);
         SearchView searchView = findViewById(R.id.searchView);
-
-        // Set click listeners for the buttons
-        exploreButton.setEnabled(false);
-
-        rightNowButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ExploreActivity.this, RightNowActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        registerEventButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ExploreActivity.this, RegisterEventActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        planATripButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ExploreActivity.this, PlanningTripActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        userProfile.setOnClickListener(v -> {
-            // Handle the click event for the FAB
-            // For example, you could navigate to an "Edit Profile" screen
-            startActivity(new Intent(ExploreActivity.this, UserProfileActivity.class));
-        });
 
         // Set up the search functionality
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -91,6 +65,17 @@ public class ExploreActivity extends AppCompatActivity {
 
         // Fetch the data from the database
         fetchDataFromDatabase();
+    }
+
+    public void confirmSelection(View view) {
+        if (selectedEvents.isEmpty()) {
+            Toast.makeText(this, "Please select at least one item", Toast.LENGTH_SHORT).show();
+        } else {
+            // Do something with the selected items
+            Toast.makeText(this, "Selected items: " + selectedEvents, Toast.LENGTH_SHORT).show();
+            selectedEvents.clear();
+            eventAdapter.notifyDataSetChanged();
+        }
     }
 
     private void filterEvents(String query) {
@@ -144,11 +129,12 @@ public class ExploreActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
+        selectedEvents = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        eventAdapter.updateData(eventData);
+        eventAdapter.updateData(eventData,selectedEvents);
         eventAdapter.setOnItemClickListener((event) -> {
-            Intent intent = new Intent(ExploreActivity.this, EventDetailsActivity.class);
+            Intent intent = new Intent(AddEventsActivity.this, EventDetailsActivity.class);
             intent.putExtra("event", event);
             startActivity(intent);
             finish();

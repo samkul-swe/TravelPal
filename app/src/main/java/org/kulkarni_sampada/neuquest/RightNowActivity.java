@@ -72,6 +72,7 @@ public class RightNowActivity extends AppCompatActivity {
             // Handle the click event for the FAB
             // For example, you could navigate to an "Edit Profile" screen
             startActivity(new Intent(RightNowActivity.this, UserProfileActivity.class));
+            finish();
         });
 
 
@@ -120,8 +121,15 @@ public class RightNowActivity extends AppCompatActivity {
                     String title = childSnapshot.child("title").getValue(String.class);
                     String image = childSnapshot.child("image").getValue(String.class);
                     String description = childSnapshot.child("description").getValue(String.class);
+                    String startTime = childSnapshot.child("startTime").getValue(String.class);
+                    String startDate = childSnapshot.child("startDate").getValue(String.class);
+                    String endTime = childSnapshot.child("endTime").getValue(String.class);
+                    String endDate = childSnapshot.child("endDate").getValue(String.class);
+                    String price = childSnapshot.child("price").getValue(String.class);
+                    String location = childSnapshot.child("location").getValue(String.class);
+                    String registrationLink = childSnapshot.child("registerLink").getValue(String.class);
 
-                    Event event = new Event(title, description, image);
+                    Event event = new Event(title, startTime, startDate, endTime, endDate, description, price, location, image, registrationLink);
                     eventData.add(event);
                 }
 

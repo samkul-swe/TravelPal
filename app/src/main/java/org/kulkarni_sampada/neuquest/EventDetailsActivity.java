@@ -3,6 +3,7 @@ package org.kulkarni_sampada.neuquest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,9 +29,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         TextView eventStartTimeTextView = findViewById(R.id.event_start_time);
         TextView eventEndTimeTextView = findViewById(R.id.event_end_time);
         TextView eventPriceTextView = findViewById(R.id.event_price);
-        TextView eventLocationTextView = findViewById(R.id.event_location);
         ImageView eventImageView = findViewById(R.id.event_image);
         Button registerButton = findViewById(R.id.register_button);
+        Button showLocationButton = findViewById(R.id.event_location);
 
         Event event = (Event) getIntent().getSerializableExtra("event");
 
@@ -43,7 +44,17 @@ public class EventDetailsActivity extends AppCompatActivity {
         eventStartTimeTextView.setText(event.getStartTime());
         eventEndTimeTextView.setText(event.getEndTime());
         eventPriceTextView.setText(event.getPrice());
-        eventLocationTextView.setText(event.getLocation());
+
+        //On Location click, open maps
+        showLocationButton.setOnClickListener(v -> {
+            if (!event.getLocation().isEmpty()) {
+                // Open the Maps application with the specified address
+                Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(event.getLocation()));
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
+            }
+        });
 
         // Load the event image
         Picasso.get().load(event.getImage()).into(eventImageView);
@@ -53,6 +64,7 @@ public class EventDetailsActivity extends AppCompatActivity {
             // Launch the browser or an in-app registration flow with the registerUrl
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getRegisterLink()));
             startActivity(intent);
+            finish();
         });
     }
 }
