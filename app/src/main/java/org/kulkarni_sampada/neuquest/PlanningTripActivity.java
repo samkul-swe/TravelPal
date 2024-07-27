@@ -1,6 +1,8 @@
 package org.kulkarni_sampada.neuquest;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,8 +24,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class PlanningTripActivity extends AppCompatActivity {
     private RangeSlider budgetRangeSlider;
@@ -43,6 +48,7 @@ public class PlanningTripActivity extends AppCompatActivity {
         bindViews();
         setupBudgetSlider();
         setupSubmitButton();
+        setupDateTimePicker();
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
@@ -64,6 +70,61 @@ public class PlanningTripActivity extends AppCompatActivity {
         eventEndDateEditText = findViewById(R.id.event_end_date_edittext);
     }
 
+    private void setupDateTimePicker() {
+        // Set click listeners for the date and time edit text views
+        eventStartDateEditText.setOnClickListener(v -> showDatePicker(eventStartDateEditText));
+        eventStartTimeEditText.setOnClickListener(v -> showTimePicker(eventStartTimeEditText));
+        eventEndDateEditText.setOnClickListener(v -> showDatePicker(eventEndDateEditText));
+        eventEndTimeEditText.setOnClickListener(v -> showTimePicker(eventEndTimeEditText));
+    }
+
+    private void showDatePicker(TextInputEditText editText) {
+        // Get the current date
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Create a DatePickerDialog
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // Format the selected date as a string
+                    String selectedDate = String.format(Locale.getDefault(), "%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear);
+
+                    // Set the selected date value in the TextView
+                    editText.setText(selectedDate);
+                },
+                year, month, day
+        );
+
+        // Show the date picker dialog
+        datePickerDialog.show();
+    }
+
+    private void showTimePicker(TextInputEditText editText) {
+        // Get the current time
+        Calendar calendar = Calendar.getInstance();
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
+
+        // Create a TimePickerDialog
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                (view, selectedHour, selectedMinute) -> {
+                    // Format the selected time as a string
+                    String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
+
+                    // Set the selected time value in the TextView
+                    editText.setText(selectedTime);
+                },
+                currentHour, currentMinute, true // true for 24-hour format
+        );
+
+        // Show the time picker dialog
+        timePickerDialog.show();
+    }
+
     @SuppressLint("SetTextI18n")
     private void setupBudgetSlider() {
         budgetRangeSlider.setValueFrom(0f);
@@ -82,6 +143,11 @@ public class PlanningTripActivity extends AppCompatActivity {
             float maxBudget = budgetRangeSlider.getValues().get(1);
             boolean includesMeals = mealsCheckbox.isChecked();
             boolean includesTransport = transportCheckbox.isChecked();
+            String eventLocation = eventLocationEditText.getText().toString();
+            String eventStartTime = Objects.requireNonNull(eventStartTimeEditText.getText()).toString();
+            String eventEndTime = Objects.requireNonNull(eventEndTimeEditText.getText()).toString();
+            String eventStartDate = Objects.requireNonNull(eventStartDateEditText.getText()).toString();
+            String eventEndDate = Objects.requireNonNull(eventEndDateEditText.getText()).toString();
 
             // Create a map with the data you want to set
             Map<String,String> itinerary = new HashMap<>();

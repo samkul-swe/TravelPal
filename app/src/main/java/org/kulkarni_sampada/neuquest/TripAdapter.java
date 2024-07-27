@@ -8,9 +8,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import org.kulkarni_sampada.neuquest.gemini.GeminiClient;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
-import java.text.DateFormat;
 import java.util.List;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
@@ -37,10 +41,21 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
         this.listener = listener;
     }
 
+    private String generateTripName(String startDate, String location) {
+        GeminiClient geminiClient = new GeminiClient();
+        Content content = new Content.Builder()
+                .addText("Give a title about an AI and magic")
+                .build();
+
+        ListenableFuture<GenerateContentResponse> response = geminiClient.getModel().generateContent(content);
+
+        return response.toString();
+    }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Trip trip = trips.get(position);
-        holder.tripDateTextView.setText(DateFormat.getDateTimeInstance().format(trip.getTimeStamp()));
+        holder.tripNameTextView.setText(generateTripName(trip.getStartDate(),trip.getLocation()));
         holder.itemView.setOnClickListener(v -> handleTripClick(trip));
     }
 
@@ -57,11 +72,11 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tripDateTextView;
+        public TextView tripNameTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tripDateTextView = itemView.findViewById(R.id.tripDateTextView);
+            tripNameTextView = itemView.findViewById(R.id.tripNameTextView);
         }
     }
 }

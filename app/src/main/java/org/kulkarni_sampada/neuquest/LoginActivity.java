@@ -45,32 +45,32 @@ public class LoginActivity extends AppCompatActivity {
 
         // Use Firebase Authentication to sign in the user
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                        assert user != null;
-                        uid = user.getUid();
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    assert user != null;
+                    uid = user.getUid();
 
-                        // Login successful
-                        // You can start a new activity or perform any other actions after successful login
-                        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                    // Login successful
+                    // You can start a new activity or perform any other actions after successful login
+                    Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
-                        // Get the SharedPreferences instance
-                        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                    // Get the SharedPreferences instance
+                    SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                        // Save the UID
-                        editor.putString(AppConstants.UID_KEY, uid);
-                        editor.apply();
+                    // Save the UID
+                    editor.putString(AppConstants.UID_KEY, uid);
+                    editor.apply();
 
-                        Intent intent = new Intent(LoginActivity.this, RightNowActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        // Login failed
-                        // Handle the error, e.g., display an error message
-                        Toast.makeText(LoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    Intent intent = new Intent(LoginActivity.this, RightNowActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    // Login failed
+                    // Handle the error, e.g., display an error message
+                    Toast.makeText(LoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 }

@@ -18,10 +18,11 @@ public class Event implements Serializable {
     private String location;
     private String registerLink;
     private String image;
+    private String eventID;
 
     public Event() {}
 
-    public Event(String title, String startTime, String startDate, String endTime, String endDate, String description, String price, String location, String image, String registerLink) {
+    public Event(String title, String startTime, String startDate, String endTime, String endDate, String description, String price, String location, String image, String registrationLink) {
         this.title = title;
         this.startTime = startTime;
         this.startDate = startDate;
@@ -31,7 +32,11 @@ public class Event implements Serializable {
         this.price = price;
         this.location = location;
         this.image = image;
-        this.registerLink = registerLink;
+        this.registerLink = registrationLink;
+    }
+
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
     }
 
     public void setTitle(String title) {
@@ -115,6 +120,10 @@ public class Event implements Serializable {
 
     public String getRegisterLink() {
         return registerLink;
+    }
+
+    public String getEventID() {
+        return eventID;
     }
 }
 

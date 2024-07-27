@@ -1,5 +1,6 @@
 package org.kulkarni_sampada.neuquest;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -29,7 +30,6 @@ public class TripDetailsActivity extends AppCompatActivity {
     private DatabaseReference eventRef;
     private List<Event> events;
     private EventAdapter eventAdapter;
-    private TextView tripNameTextView, tripBudgetTextView, tripPreferencesTextView;
     private Trip trip;
 
     @Override
@@ -95,13 +95,14 @@ public class TripDetailsActivity extends AppCompatActivity {
         updateUI();
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateUI() {
 
-        tripNameTextView = findViewById(R.id.trip_name);
-        tripBudgetTextView = findViewById(R.id.trip_budget);
-        tripPreferencesTextView = findViewById(R.id.trip_preferences);
+        TextView tripNameTextView = findViewById(R.id.trip_name);
+        TextView tripBudgetTextView = findViewById(R.id.trip_budget);
+        TextView tripPreferencesTextView = findViewById(R.id.trip_preferences);
 
-        tripNameTextView.setText(DateFormat.getDateTimeInstance().format(trip.getTimeStamp()));
+        tripNameTextView.setText(DateFormat.getDateTimeInstance().format(trip.getTripID()));
         tripBudgetTextView.setText("Budget from $" + trip.getMinBudget() + " - $" + trip.getMaxBudget());
         if (trip.isMealsIncluded() && !trip.isTransportIncluded()) {
             tripPreferencesTextView.setText("Meal included in budget");

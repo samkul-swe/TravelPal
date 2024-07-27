@@ -1,11 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
     namespace = "org.kulkarni_sampada.neuquest"
     compileSdk = 34
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "org.kulkarni_sampada.neuquest"
@@ -48,4 +53,5 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
+    implementation(libs.generativeai)
 }

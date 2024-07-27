@@ -2,14 +2,16 @@
 agp = "8.5.0"
 firebaseBom = "33.1.2"
 firebaseDatabaseKtx = "21.0.0"
+generativeai = "0.9.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
 material = "1.12.0"
-activity = "1.9.0"
+activity = "1.9.1"
 constraintlayout = "2.1.4"
-picasso = "2.8"
+picasso = "2.71828"
+secretsGradlePlugin = "2.0.1"
 
 [libraries]
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
@@ -17,6 +19,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-database = { module = "com.google.firebase:firebase-database", version.ref = "firebaseDatabaseKtx" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
+generativeai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "generativeai" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -25,6 +28,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

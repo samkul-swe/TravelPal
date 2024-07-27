@@ -14,10 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
 import java.util.ArrayList;
@@ -26,9 +25,7 @@ import java.util.List;
 public class UserProfileActivity extends AppCompatActivity {
 
     private TextView nameTextView;
-
     private List<Trip> trips;
-    private DatabaseReference userRef;
     private String userName;
 
     @Override
@@ -38,20 +35,17 @@ public class UserProfileActivity extends AppCompatActivity {
 
         nameTextView = findViewById(R.id.nameTextView);
 
-        // Get the current user's ID
-        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        String uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
-
-        // Get a reference to the Firebase Realtime Database
-        userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid);
-
         fetchDataFromDatabase();
     }
 
     private void fetchDataFromDatabase() {
+        // Get the current user's ID
+        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        String uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
+
         trips = new ArrayList<>();
 
-        userRef.addValueEventListener(new ValueEventListener() {
+        DatabaseConnector.getUsersRef().child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // Get the user's name
@@ -62,18 +56,23 @@ public class UserProfileActivity extends AppCompatActivity {
 
                 // Iterate through the data snapshot and add the user data to the list
                 for (DataSnapshot tripSnapshot : snapshot.child("itinerary").getChildren()) {
-                    long timeStamp = Long.parseLong(tripSnapshot.getKey());
+                    String tripID = tripSnapshot.getKey();
                     String minBudget = tripSnapshot.child("minBudget").getValue(String.class);
                     String maxBudget = tripSnapshot.child("maxBudget").getValue(String.class);
                     String mealsIncluded = tripSnapshot.child("mealsIncluded").getValue(String.class);
                     String transportIncluded = tripSnapshot.child("transportIncluded").getValue(String.class);
+                    String startDate = tripSnapshot.child("startDate").getValue(String.class);
+                    String startTime = tripSnapshot.child("startTime").getValue(String.class);
+                    String endDate = tripSnapshot.child("endDate").getValue(String.class);
+                    String endTime = tripSnapshot.child("endTime").getValue(String.class);
+                    String location = tripSnapshot.child("location").getValue(String.class);
 
                     List<String> eventIDs = new ArrayList<>();
                     for (DataSnapshot eventSnapshot : tripSnapshot.child("events").getChildren()) {
                         eventIDs.add(String.valueOf(eventSnapshot.getValue(long.class)));
                     }
 
-                    Trip trip = new Trip(timeStamp, minBudget, maxBudget, mealsIncluded, transportIncluded, eventIDs);
+                    Trip trip = new Trip(tripID, minBudget, maxBudget, mealsIncluded, transportIncluded, eventIDs, startDate, startTime, endDate, endTime, location);
                     trips.add(trip);
                 }
 

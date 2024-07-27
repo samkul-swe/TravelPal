@@ -1,7 +1,6 @@
 package org.kulkarni_sampada.neuquest.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Trip implements Serializable {
@@ -9,18 +8,84 @@ public class Trip implements Serializable {
     private String mealsIncluded;
     private String minBudget;
     private String transportIncluded;
-    private long timeStamp;
-    private List<Event> events;
+    private String location;
+    private String startDate;
+    private String startTime;
+    private String endDate;
+    private String endTime;
+    private String tripID;
     private List<String> eventIDs;
 
-    public Trip(long timeStamp, String minBudget, String maxBudget, String mealsIncluded, String transportIncluded, List<String> eventIDs) {
-        this.timeStamp = timeStamp;
+    public Trip() {}
+
+    public Trip(String tripID, String minBudget, String maxBudget, String mealsIncluded, String transportIncluded, List<String> eventIDs, String startDate, String startTime, String endDate, String endTime, String location) {
+        this.tripID = tripID;
         this.minBudget = minBudget;
         this.maxBudget = maxBudget;
         this.mealsIncluded = mealsIncluded;
         this.transportIncluded = transportIncluded;
         this.eventIDs = eventIDs;
-        this.events =  new ArrayList<>();
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.endDate = endDate;
+        this.endTime = endTime;
+        this.location = location;
+    }
+
+    public String getMealsIncluded() {
+        return mealsIncluded;
+    }
+
+    public String getTransportIncluded() {
+        return transportIncluded;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setTripID(String tripID) {
+        this.tripID = tripID;
+    }
+
+    public void setEventIDs(List<String> eventIDs) {
+        this.eventIDs = eventIDs;
     }
 
     public void setMaxBudget(String maxBudget) {
@@ -39,8 +104,8 @@ public class Trip implements Serializable {
         this.transportIncluded = transportIncluded;
     }
 
-    public void addEvent(Event event) {
-        this.events.add(event);
+    public void addEventID(String eventID) {
+        this.eventIDs.add(eventID);
     }
 
     public String getMaxBudget() {
@@ -59,15 +124,11 @@ public class Trip implements Serializable {
         return Boolean.parseBoolean(transportIncluded);
     }
 
-    public long getTimeStamp(){
-        return timeStamp;
+    public String getTripID(){
+        return tripID;
     }
 
     public List<String> getEventIDs() {
         return eventIDs;
-    }
-
-    public List<Event> getEvents() {
-        return events;
     }
 }

@@ -4,34 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 import org.kulkarni_sampada.neuquest.model.Event;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AddEventsActivity extends AppCompatActivity {
-
-    private DatabaseReference databaseRef;
     private List<Event> eventData, selectedEvents;
     private EventAdapter eventAdapter;
 
@@ -40,9 +31,7 @@ public class AddEventsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_events);
 
-        // Get a reference to the Firebase Realtime Database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        databaseRef = database.getReference("Events");
+
         eventAdapter = new EventAdapter();
 
         // Find the buttons
@@ -93,7 +82,7 @@ public class AddEventsActivity extends AppCompatActivity {
     private void fetchDataFromDatabase() {
         eventData = new ArrayList<>();
 
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        DatabaseConnector.getEventsRef().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // Clear the previous data

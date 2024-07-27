@@ -14,10 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 import org.kulkarni_sampada.neuquest.model.Event;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import java.util.List;
 
 public class RightNowActivity extends AppCompatActivity {
 
-    private DatabaseReference databaseRef;
     private List<Event> eventData;
     private EventAdapter eventAdapter;
 
@@ -34,9 +32,6 @@ public class RightNowActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_right_now);
 
-        // Get a reference to the Firebase Realtime Database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        databaseRef = database.getReference("Events");
         eventAdapter = new EventAdapter();
 
         // Find the buttons
@@ -110,7 +105,7 @@ public class RightNowActivity extends AppCompatActivity {
     private void fetchDataFromDatabase() {
         eventData = new ArrayList<>();
 
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        DatabaseConnector.getEventsRef().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // Clear the previous data

@@ -24,9 +24,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
@@ -65,10 +63,6 @@ public class RegisterEventActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
         uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
 
-        // Get an instance of the Firebase Realtime Database
-        firebaseDatabase = FirebaseDatabase.getInstance().getReference();
-        storageReference = FirebaseStorage.getInstance().getReference();
-
         // Find the views
         eventNameEditText = findViewById(R.id.event_name_edittext);
         eventDescriptionEditText = findViewById(R.id.event_description_edittext);
@@ -90,17 +84,17 @@ public class RegisterEventActivity extends AppCompatActivity {
         eventEndTimeEditText.setOnClickListener(v -> showTimePicker(eventEndTimeEditText));
 
         launcher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        // There are no request codes
-                        Intent data = result.getData();
-                        assert data != null;
-                        imageUri = data.getData();
-                        getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        imageView.setImageURI(imageUri);
-                    }
-                });
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    // There are no request codes
+                    Intent data = result.getData();
+                    assert data != null;
+                    imageUri = data.getData();
+                    getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    imageView.setImageURI(imageUri);
+                }
+            });
 
         // Set click listeners for image upload
         buttonSelectImage.setOnClickListener(v -> openGallery());
@@ -171,15 +165,15 @@ public class RegisterEventActivity extends AppCompatActivity {
 
         // Create a DatePickerDialog
         DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,
-                (view, selectedYear, selectedMonth, selectedDay) -> {
-                    // Format the selected date as a string
-                    String selectedDate = String.format(Locale.getDefault(), "%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear);
+            this,
+            (view, selectedYear, selectedMonth, selectedDay) -> {
+                // Format the selected date as a string
+                String selectedDate = String.format(Locale.getDefault(), "%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear);
 
-                    // Set the selected date value in the TextView
-                    editText.setText(selectedDate);
-                },
-                year, month, day
+                // Set the selected date value in the TextView
+                editText.setText(selectedDate);
+            },
+            year, month, day
         );
 
         // Show the date picker dialog
@@ -194,15 +188,15 @@ public class RegisterEventActivity extends AppCompatActivity {
 
         // Create a TimePickerDialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(
-                this,
-                (view, selectedHour, selectedMinute) -> {
-                    // Format the selected time as a string
-                    String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
+            this,
+            (view, selectedHour, selectedMinute) -> {
+                // Format the selected time as a string
+                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
 
-                    // Set the selected time value in the TextView
-                    editText.setText(selectedTime);
-                },
-                currentHour, currentMinute, true // true for 24-hour format
+                // Set the selected time value in the TextView
+                editText.setText(selectedTime);
+            },
+            currentHour, currentMinute, true // true for 24-hour format
         );
 
         // Show the time picker dialog
@@ -216,19 +210,19 @@ public class RegisterEventActivity extends AppCompatActivity {
 
         // Upload the file to Firebase Storage
         StorageTask<UploadTask.TaskSnapshot> uploadTask = fileReference.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Handle the successful upload
-                    Toast.makeText(RegisterEventActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
-                })
-                .addOnProgressListener(snapshot -> {
-                    // Handle the upload progress
-                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                    Log.d("Firebase Upload", "Upload is " + progress + "% done");
-                })
-                .addOnFailureListener(e -> {
-                    // Handle the upload failure
-                    Toast.makeText(RegisterEventActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                });
+            .addOnSuccessListener(taskSnapshot -> {
+                // Handle the successful upload
+                Toast.makeText(RegisterEventActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
+            })
+            .addOnProgressListener(snapshot -> {
+                // Handle the upload progress
+                double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                Log.d("Firebase Upload", "Upload is " + progress + "% done");
+            })
+            .addOnFailureListener(e -> {
+                // Handle the upload failure
+                Toast.makeText(RegisterEventActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+            });
         TimeUnit.SECONDS.sleep(5);
         eventImage = fileReference.getName();
         return uploadTask.isSuccessful();
@@ -243,15 +237,15 @@ public class RegisterEventActivity extends AppCompatActivity {
                 if (!snapshot.exists()) {
                     // The user's UID does not exist, so create a new entry
                     eventRef.setValue(eventData)
-                            .addOnSuccessListener(aVoid -> {
-                                // Data has been successfully written to the database
-                                Toast.makeText(RegisterEventActivity.this, "Event data saved", Toast.LENGTH_SHORT).show();
-                                eventSaved = true;
-                            })
-                            .addOnFailureListener(e -> {
-                                // Handle any errors that occurred during the write operation
-                                Toast.makeText(RegisterEventActivity.this, "Error saving event data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
+                        .addOnSuccessListener(aVoid -> {
+                            // Data has been successfully written to the database
+                            Toast.makeText(RegisterEventActivity.this, "Event data saved", Toast.LENGTH_SHORT).show();
+                            eventSaved = true;
+                        })
+                        .addOnFailureListener(e -> {
+                            // Handle any errors that occurred during the write operation
+                            Toast.makeText(RegisterEventActivity.this, "Error saving event data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
                 }
             }
 
