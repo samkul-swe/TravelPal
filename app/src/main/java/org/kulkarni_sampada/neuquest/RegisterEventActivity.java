@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,19 +22,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
-import com.google.firebase.storage.UploadTask;
+
+import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
+import org.kulkarni_sampada.neuquest.firebase.StorageConnector;
+import org.kulkarni_sampada.neuquest.model.Event;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class RegisterEventActivity extends AppCompatActivity {
 
@@ -43,15 +38,10 @@ public class RegisterEventActivity extends AppCompatActivity {
     private EditText eventNameEditText, eventDescriptionEditText, eventPriceEditText, eventLocationEditText, eventRegisterLinkEditText;
     private TextInputEditText eventStartTimeEditText, eventEndTimeEditText, eventStartDateEditText, eventEndDateEditText;
     private ImageView imageView;
-    private String eventTitle, eventDescription, eventPrice, eventLocation, eventStartTime, eventEndTime, eventStartDate, eventEndDate, eventRegisterLink, eventImage, uid;
-
-    private DatabaseReference firebaseDatabase, eventRef;
-    private StorageReference storageReference;
-
-    private Map<String, Object> eventData;
-    private boolean eventSaved = false;
+    private String eventID, eventTitle, eventDescription, eventPrice, eventLocation, eventStartTime, eventEndTime, eventStartDate, eventEndDate, eventRegisterLink, uid;
 
     private Uri imageUri;
+    private DatabaseConnector databaseConnector = new DatabaseConnector();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -93,6 +83,11 @@ public class RegisterEventActivity extends AppCompatActivity {
                     imageUri = data.getData();
                     getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     imageView.setImageURI(imageUri);
+                    try {
+                        StorageConnector.uploadEventImage(imageUri, uid);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
 
@@ -106,6 +101,7 @@ public class RegisterEventActivity extends AppCompatActivity {
     private void saveEvent() {
 
         // Get the values from the EditText fields
+        eventID = String.valueOf(System.currentTimeMillis());
         eventTitle = eventNameEditText.getText().toString();
         eventDescription = eventDescriptionEditText.getText().toString();
         eventPrice = eventPriceEditText.getText().toString();
@@ -115,34 +111,6 @@ public class RegisterEventActivity extends AppCompatActivity {
         eventStartDate = Objects.requireNonNull(eventStartDateEditText.getText()).toString();
         eventEndDate = Objects.requireNonNull(eventEndDateEditText.getText()).toString();
         eventRegisterLink = eventRegisterLinkEditText.getText().toString();
-
-        // Create a new thread to execute the first method
-        Thread eventThread = new Thread(() -> {
-            boolean imageUploaded;
-            try {
-                imageUploaded = uploadImageToFirebase();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            if (imageUploaded) {
-                // Create a map with the data you want to set
-                eventData = getStringObjectMap();
-
-                // Get a reference to the user's data in the database
-                long currentTimestamp = System.currentTimeMillis();
-                eventRef = firebaseDatabase.child("Events").child(String.valueOf(currentTimestamp));
-
-                try {
-                    saveEventToFirebase();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                if (eventSaved) {
-                    startNextActivity();
-                }
-            }
-        });
-        eventThread.start();
     }
 
     @SuppressLint("IntentReset")
@@ -203,44 +171,19 @@ public class RegisterEventActivity extends AppCompatActivity {
         timePickerDialog.show();
     }
 
-    private boolean uploadImageToFirebase() throws InterruptedException {
-
-        // Create a reference to the file in Firebase Storage
-        StorageReference fileReference = storageReference.child(UUID.randomUUID().toString());
-
-        // Upload the file to Firebase Storage
-        StorageTask<UploadTask.TaskSnapshot> uploadTask = fileReference.putFile(imageUri)
-            .addOnSuccessListener(taskSnapshot -> {
-                // Handle the successful upload
-                Toast.makeText(RegisterEventActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
-            })
-            .addOnProgressListener(snapshot -> {
-                // Handle the upload progress
-                double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                Log.d("Firebase Upload", "Upload is " + progress + "% done");
-            })
-            .addOnFailureListener(e -> {
-                // Handle the upload failure
-                Toast.makeText(RegisterEventActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-            });
-        TimeUnit.SECONDS.sleep(5);
-        eventImage = fileReference.getName();
-        return uploadTask.isSuccessful();
-    }
-
     private void saveEventToFirebase() throws InterruptedException {
+        Event event = new Event(eventID, eventTitle, eventDescription, eventPrice, eventLocation, eventStartTime, eventEndTime, eventStartDate, eventEndDate, eventRegisterLink);
 
         // Check if the user's UID already exists in the database
-        eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseConnector.getEventsRef().child(eventID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
                     // The user's UID does not exist, so create a new entry
-                    eventRef.setValue(eventData)
+                    databaseConnector.getEventsRef().setValue(event)
                         .addOnSuccessListener(aVoid -> {
                             // Data has been successfully written to the database
                             Toast.makeText(RegisterEventActivity.this, "Event data saved", Toast.LENGTH_SHORT).show();
-                            eventSaved = true;
                         })
                         .addOnFailureListener(e -> {
                             // Handle any errors that occurred during the write operation
@@ -255,28 +198,5 @@ public class RegisterEventActivity extends AppCompatActivity {
                 Toast.makeText(RegisterEventActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        TimeUnit.SECONDS.sleep(5);
-    }
-
-    private void startNextActivity() {
-        Intent intent = new Intent(RegisterEventActivity.this, RightNowActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private @NonNull Map<String, Object> getStringObjectMap() {
-        Map<String, Object> eventData = new HashMap<>();
-        eventData.put("title", eventTitle);
-        eventData.put("startTime", eventStartTime);
-        eventData.put("startDate", eventStartDate);
-        eventData.put("endTime", eventEndTime);
-        eventData.put("endDate", eventEndDate);
-        eventData.put("description", eventDescription);
-        eventData.put("price", eventPrice);
-        eventData.put("location", eventLocation);
-        eventData.put("image", eventImage);
-        eventData.put("registerLink", eventRegisterLink);
-        eventData.put("createdBy", uid);
-        return eventData;
     }
 }

@@ -1,5 +1,6 @@
 package org.kulkarni_sampada.neuquest;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
@@ -14,24 +15,23 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 
+import org.kulkarni_sampada.neuquest.firebase.AuthConnector;
 import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 import org.kulkarni_sampada.neuquest.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class SignUpActivity extends AppCompatActivity {
     private EditText nameEditText, emailEditText, passwordEditText;
-    private FirebaseAuth firebaseAuth;
     private String uid, name;
+    private DatabaseConnector databaseConnector = new DatabaseConnector();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
-        // Initialize Firebase Authentication
-        FirebaseApp.initializeApp(this);
-        firebaseAuth = FirebaseAuth.getInstance();
 
         // Find the views by their IDs
         nameEditText = findViewById(R.id.name_edittext);
@@ -45,12 +45,15 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void addUserToDatabase() {
         // Creating a user
+        List<String> tripList = new ArrayList<>();
+        tripList.add("Sample Trip");
         User currentUser = new User();
         currentUser.setName(name);
         currentUser.setUserID(uid);
+        currentUser.setTrips(tripList);
 
         // Get a reference to the user's data in the database
-        DatabaseReference userRef = DatabaseConnector.getUsersRef().child(currentUser.getUserID());
+        DatabaseReference userRef = databaseConnector.getUsersRef().child(currentUser.getUserID());
 
         // Save user in the database;
         userRef.setValue(currentUser);
@@ -63,12 +66,12 @@ public class SignUpActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString();
 
         // Create a new user with the provided email and password
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
+        AuthConnector.getFirebaseAuth().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     // Sign-up successful
                     // You can update the user's profile with the name
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    FirebaseUser user = AuthConnector.getFirebaseAuth().getCurrentUser();
                     if (user != null) {
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                             .setDisplayName(name)
@@ -90,6 +93,10 @@ public class SignUpActivity extends AppCompatActivity {
                                     editor.apply();
 
                                     addUserToDatabase();
+
+                                    Intent intent = new Intent(SignUpActivity.this, RightNowActivity.class);
+                                    startActivity(intent);
+                                    finish();
                                 } else {
                                     // Name update failed
                                     Toast.makeText(SignUpActivity.this, "Failed to update name", Toast.LENGTH_SHORT).show();

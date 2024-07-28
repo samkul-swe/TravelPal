@@ -1,4 +1,4 @@
-package org.kulkarni_sampada.neuquest;
+package org.kulkarni_sampada.neuquest.recycler;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,15 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import org.kulkarni_sampada.neuquest.R;
 import org.kulkarni_sampada.neuquest.model.Event;
 
 import java.util.List;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
+public class TimelineEventAdapter extends RecyclerView.Adapter<TimelineEventAdapter.ViewHolder> {
     private List<Event> events;
-    private EventAdapter.OnItemClickListener listener;
+    private TimelineEventAdapter.OnItemClickListener listener;
 
-    public EventAdapter() {}
+    public TimelineEventAdapter() {}
 
     public void updateData(List<Event> events) {
         this.events = events;
@@ -27,26 +28,27 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public TimelineEventAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_event, parent, false);
-        return new ViewHolder(view);
+        return new TimelineEventAdapter.ViewHolder(view);
     }
 
     public interface OnItemClickListener {
         void onItemClick(Event event);
     }
 
-    public void setOnItemClickListener(EventAdapter.OnItemClickListener listener) {
+    public void setOnItemClickListener(TimelineEventAdapter.OnItemClickListener listener) {
         this.listener = listener;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TimelineEventAdapter.ViewHolder holder, int position) {
         Event event = events.get(position);
         Picasso.get().load(event.getImage()).into(holder.imageView);
         holder.titleTextView.setText(event.getTitle());
         holder.descriptionTextView.setText(event.getDescription());
+        holder.timeTextView.setText(event.getStartTime());
         holder.itemView.setOnClickListener(v -> handleEventClick(event));
     }
 
@@ -66,12 +68,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         public ImageView imageView;
         public TextView titleTextView;
         public TextView descriptionTextView;
+        public TextView timeTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.image_view);
-            titleTextView = itemView.findViewById(R.id.title_text_view);
-            descriptionTextView = itemView.findViewById(R.id.description_text_view);
+            imageView = itemView.findViewById(R.id.event_image);
+            titleTextView = itemView.findViewById(R.id.event_name);
+            descriptionTextView = itemView.findViewById(R.id.event_description);
+            timeTextView = itemView.findViewById(R.id.event_time);
         }
     }
 }

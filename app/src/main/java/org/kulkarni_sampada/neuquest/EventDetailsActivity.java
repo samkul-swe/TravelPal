@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import org.kulkarni_sampada.neuquest.model.Event;
@@ -30,7 +31,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         TextView eventPriceTextView = findViewById(R.id.event_price);
         ImageView eventImageView = findViewById(R.id.event_image);
         Button registerButton = findViewById(R.id.register_button);
-        Button showLocationButton = findViewById(R.id.event_location);
+        FloatingActionButton showLocationButton = findViewById(R.id.show_location_fab);
 
         Event event = (Event) getIntent().getSerializableExtra("event");
 

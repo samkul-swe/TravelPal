@@ -3,33 +3,31 @@ package org.kulkarni_sampada.neuquest.firebase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-// Singleton pattern
 public class DatabaseConnector {
-    private volatile FirebaseDatabase firebaseDatabase;
-    private static DatabaseReference usersRef, eventsRef;
-    private static final Object lock = new Object();
+    private static DatabaseConnector instance;
+    private FirebaseDatabase database;
 
-    DatabaseConnector() {
-        getFirebaseDatabase();
+    private DatabaseConnector() {
+        // Initialize the Firebase Realtime Database
+        database = FirebaseDatabase.getInstance();
     }
 
-    public void getFirebaseDatabase() {
-        if (firebaseDatabase == null) {
-            synchronized (lock) {
-                if (firebaseDatabase == null) {
-                    firebaseDatabase = FirebaseDatabase.getInstance();
-                    usersRef = firebaseDatabase.getReference("Users");
-                    eventsRef = firebaseDatabase.getReference("Events");
-                }
-            }
+    public static synchronized DatabaseConnector getInstance() {
+        if (instance == null) {
+            instance = new DatabaseConnector();
         }
+        return instance;
     }
 
-    public static DatabaseReference getUsersRef() {
-        return usersRef;
+    public DatabaseReference getUsersReference(String userId) {
+        return database.getReference("Users").child(userId);
     }
 
-    public static DatabaseReference getEventsRef() {
-        return eventsRef;
+    public DatabaseReference getEventsReference() {
+        return database.getReference("Events");
+    }
+
+    public DatabaseReference getTripsReference() {
+        return database.getReference("Trips");
     }
 }

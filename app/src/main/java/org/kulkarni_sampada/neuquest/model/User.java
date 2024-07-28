@@ -1,11 +1,12 @@
 package org.kulkarni_sampada.neuquest.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
     private String userID;
     private String name;
-    private List<String> itinerary; // list of trip IDs
+    private List<String> plannedTrips; // list of trip IDs
 
     public User(){}
 
@@ -25,11 +26,11 @@ public class User {
         this.name = name;
     }
 
-    public List<String> getItinerary() {
-        return itinerary;
+    public List<String> getTrips() {
+        return plannedTrips;
     }
 
-    public void setItinerary(List<String> itinerary) {
-        this.itinerary = itinerary;
+    public void setTrips(List<String> plannedTrips) {
+        this.plannedTrips = plannedTrips;
     }
 }

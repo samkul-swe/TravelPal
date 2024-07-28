@@ -54,4 +54,5 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
     implementation(libs.generativeai)
+    implementation(libs.material.v130alpha02)
 }

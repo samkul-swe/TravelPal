@@ -2,7 +2,6 @@ package org.kulkarni_sampada.neuquest;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -18,8 +17,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 import org.kulkarni_sampada.neuquest.model.Event;
 import org.kulkarni_sampada.neuquest.model.Trip;
+import org.kulkarni_sampada.neuquest.recycler.TimelineEventAdapter;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -27,76 +28,24 @@ import java.util.List;
 
 public class TripDetailsActivity extends AppCompatActivity {
 
-    private DatabaseReference eventRef;
     private List<Event> events;
-    private EventAdapter eventAdapter;
+    private TimelineEventAdapter eventAdapter;
     private Trip trip;
+    private DatabaseConnector databaseConnector = new DatabaseConnector();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
 
-        // Get the SharedPreferences instance
-        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
-        String uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
-
         trip = (Trip) getIntent().getSerializableExtra("trip");
 
         // Get a reference to the Firebase Realtime Database
         assert trip != null;
-        eventRef = FirebaseDatabase.getInstance().getReference("Events");
-        eventAdapter = new EventAdapter();
+        eventAdapter = new TimelineEventAdapter();
 
         // Fetch the events of the trip
         fetchEvents();
-    }
-
-
-    private Event getEvent(String eventID) {
-
-        Event event = new Event();
-
-        eventRef.child(eventID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                event.setTitle(snapshot.child("title").getValue(String.class));
-                event.setImage(snapshot.child("image").getValue(String.class));
-                event.setDescription(snapshot.child("description").getValue(String.class));
-                event.setStartTime(snapshot.child("startTime").getValue(String.class));
-                event.setStartDate(snapshot.child("startDate").getValue(String.class));
-                event.setEndTime(snapshot.child("endTime").getValue(String.class));
-                event.setEndDate(snapshot.child("endDate").getValue(String.class));
-                event.setPrice(snapshot.child("price").getValue(String.class));
-                event.setLocation(snapshot.child("location").getValue(String.class));
-                event.setRegisterLink(snapshot.child("registerLink").getValue(String.class));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle any errors that occurred while fetching the data
-                Log.e("Firebase", "Error fetching data: " + error.getMessage());
-            }
-        });
-
-        return event;
-    }
-
-
-
-    private void fetchEvents() {
-        events = new ArrayList<>();
-
-        for (String eventID : trip.getEventIDs()) {
-            Event event = getEvent(eventID);
-            events.add(event);
-        }
-
-        updateUI();
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void updateUI() {
 
         TextView tripNameTextView = findViewById(R.id.trip_name);
         TextView tripBudgetTextView = findViewById(R.id.trip_budget);
@@ -124,5 +73,37 @@ public class TripDetailsActivity extends AppCompatActivity {
             finish();
         });
         recyclerView.setAdapter(eventAdapter);
+    }
+
+
+    private Event getEvent(String eventID) {
+
+        final Event[] event = {new Event()};
+
+        databaseConnector.getEventsRef().child(eventID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                event[0] = snapshot.getValue(Event.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle any errors that occurred while fetching the data
+                Log.e("Firebase", "Error fetching data: " + error.getMessage());
+            }
+        });
+
+        return event[0];
+    }
+
+
+
+    private void fetchEvents() {
+        events = new ArrayList<>();
+
+        for (String eventID : trip.getEventIDs()) {
+            Event event = getEvent(eventID);
+            events.add(event);
+        }
     }
 }

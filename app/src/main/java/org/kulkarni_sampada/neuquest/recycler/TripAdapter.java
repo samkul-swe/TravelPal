@@ -1,4 +1,4 @@
-package org.kulkarni_sampada.neuquest;
+package org.kulkarni_sampada.neuquest.recycler;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +12,7 @@ import com.google.ai.client.generativeai.type.Content;
 import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.kulkarni_sampada.neuquest.R;
 import org.kulkarni_sampada.neuquest.gemini.GeminiClient;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
@@ -56,6 +57,8 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Trip trip = trips.get(position);
         holder.tripNameTextView.setText(generateTripName(trip.getStartDate(),trip.getLocation()));
+        holder.tripDateTextView.setText(trip.getStartDate());
+        holder.tripDestinationTextView.setText(trip.getLocation());
         holder.itemView.setOnClickListener(v -> handleTripClick(trip));
     }
 
@@ -73,10 +76,14 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tripNameTextView;
+        public TextView tripDateTextView;
+        public TextView tripDestinationTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tripNameTextView = itemView.findViewById(R.id.tripNameTextView);
+            tripNameTextView = itemView.findViewById(R.id.trip_name);
+            tripDateTextView = itemView.findViewById(R.id.trip_date);
+            tripDestinationTextView = itemView.findViewById(R.id.trip_destination);
         }
     }
 }

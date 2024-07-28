@@ -9,25 +9,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import org.kulkarni_sampada.neuquest.firebase.AuthConnector;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailEditText;
     private EditText passwordEditText;
-    private FirebaseAuth firebaseAuth;
     private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        // Initialize Firebase Auth
-        FirebaseApp.initializeApp(this);
-        firebaseAuth = FirebaseAuth.getInstance();
 
         // Find the views by their IDs
         emailEditText = findViewById(R.id.email_edittext);
@@ -44,10 +39,10 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString();
 
         // Use Firebase Authentication to sign in the user
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+        AuthConnector.getFirebaseAuth().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    FirebaseUser user = AuthConnector.getFirebaseAuth().getCurrentUser();
                     assert user != null;
                     uid = user.getUid();
 

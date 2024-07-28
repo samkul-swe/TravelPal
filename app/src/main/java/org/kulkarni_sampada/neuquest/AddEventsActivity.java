@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 import org.kulkarni_sampada.neuquest.model.Event;
+import org.kulkarni_sampada.neuquest.recycler.EventAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
 public class AddEventsActivity extends AppCompatActivity {
     private List<Event> eventData, selectedEvents;
     private EventAdapter eventAdapter;
+    private DatabaseConnector databaseConnector = new DatabaseConnector();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,6 @@ public class AddEventsActivity extends AppCompatActivity {
             // Do something with the selected items
             Toast.makeText(this, "Selected items: " + selectedEvents, Toast.LENGTH_SHORT).show();
             selectedEvents.clear();
-            eventAdapter.notifyDataSetChanged();
         }
     }
 
@@ -82,7 +83,7 @@ public class AddEventsActivity extends AppCompatActivity {
     private void fetchDataFromDatabase() {
         eventData = new ArrayList<>();
 
-        DatabaseConnector.getEventsRef().addValueEventListener(new ValueEventListener() {
+        databaseConnector.getEventsRef().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // Clear the previous data
@@ -121,7 +122,6 @@ public class AddEventsActivity extends AppCompatActivity {
         selectedEvents = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        eventAdapter.updateData(eventData,selectedEvents);
         eventAdapter.setOnItemClickListener((event) -> {
             Intent intent = new Intent(AddEventsActivity.this, EventDetailsActivity.class);
             intent.putExtra("event", event);
