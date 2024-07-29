@@ -12,20 +12,16 @@ import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DatabaseReference;
 
-import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
-import org.kulkarni_sampada.neuquest.firebase.StorageConnector;
+import org.kulkarni_sampada.neuquest.firebase.repository.database.EventRepository;
+import org.kulkarni_sampada.neuquest.firebase.repository.storage.EventImageRepository;
 import org.kulkarni_sampada.neuquest.model.Event;
 
 import java.util.Calendar;
@@ -38,10 +34,8 @@ public class RegisterEventActivity extends AppCompatActivity {
     private EditText eventNameEditText, eventDescriptionEditText, eventPriceEditText, eventLocationEditText, eventRegisterLinkEditText;
     private TextInputEditText eventStartTimeEditText, eventEndTimeEditText, eventStartDateEditText, eventEndDateEditText;
     private ImageView imageView;
-    private String eventID, eventTitle, eventDescription, eventPrice, eventLocation, eventStartTime, eventEndTime, eventStartDate, eventEndDate, eventRegisterLink, uid;
-
+    private String uid, eventID;
     private Uri imageUri;
-    private DatabaseConnector databaseConnector = new DatabaseConnector();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -52,6 +46,10 @@ public class RegisterEventActivity extends AppCompatActivity {
         // Get the SharedPreferences instance
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
         uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
+
+        eventID = String.valueOf(System.currentTimeMillis());
+
+        EventImageRepository eventImageRepo = new EventImageRepository();
 
         // Find the views
         eventNameEditText = findViewById(R.id.event_name_edittext);
@@ -83,11 +81,7 @@ public class RegisterEventActivity extends AppCompatActivity {
                     imageUri = data.getData();
                     getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     imageView.setImageURI(imageUri);
-                    try {
-                        StorageConnector.uploadEventImage(imageUri, uid);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                    eventImageRepo.uploadEventImage(imageUri, eventID);
                 }
             });
 
@@ -99,18 +93,30 @@ public class RegisterEventActivity extends AppCompatActivity {
     }
 
     private void saveEvent() {
+        Event event = new Event();
 
         // Get the values from the EditText fields
-        eventID = String.valueOf(System.currentTimeMillis());
-        eventTitle = eventNameEditText.getText().toString();
-        eventDescription = eventDescriptionEditText.getText().toString();
-        eventPrice = eventPriceEditText.getText().toString();
-        eventLocation = eventLocationEditText.getText().toString();
-        eventStartTime = Objects.requireNonNull(eventStartTimeEditText.getText()).toString();
-        eventEndTime = Objects.requireNonNull(eventEndTimeEditText.getText()).toString();
-        eventStartDate = Objects.requireNonNull(eventStartDateEditText.getText()).toString();
-        eventEndDate = Objects.requireNonNull(eventEndDateEditText.getText()).toString();
-        eventRegisterLink = eventRegisterLinkEditText.getText().toString();
+        event.setEventID(eventID);
+        event.setTitle(eventNameEditText.getText().toString());
+        event.setDescription(eventDescriptionEditText.getText().toString());
+        event.setPrice(eventPriceEditText.getText().toString());
+        event.setLocation(eventLocationEditText.getText().toString());
+        event.setStartTime(Objects.requireNonNull(eventStartTimeEditText.getText()).toString());
+        event.setEndTime(Objects.requireNonNull(eventEndTimeEditText.getText()).toString());
+        event.setStartDate(Objects.requireNonNull(eventStartDateEditText.getText()).toString());
+        event.setEndDate(Objects.requireNonNull(eventEndDateEditText.getText()).toString());
+        event.setRegisterLink(eventRegisterLinkEditText.getText().toString());
+        event.setCreatedBy(uid);
+        event.setImage(eventID);
+
+        EventRepository eventRepository = new EventRepository();
+        DatabaseReference eventRef = eventRepository.getEventRef().child(event.getEventID());
+
+        eventRef.setValue(event);
+
+        Intent intent = new Intent(RegisterEventActivity.this, RightNowActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @SuppressLint("IntentReset")
@@ -169,34 +175,5 @@ public class RegisterEventActivity extends AppCompatActivity {
 
         // Show the time picker dialog
         timePickerDialog.show();
-    }
-
-    private void saveEventToFirebase() throws InterruptedException {
-        Event event = new Event(eventID, eventTitle, eventDescription, eventPrice, eventLocation, eventStartTime, eventEndTime, eventStartDate, eventEndDate, eventRegisterLink);
-
-        // Check if the user's UID already exists in the database
-        databaseConnector.getEventsRef().child(eventID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    // The user's UID does not exist, so create a new entry
-                    databaseConnector.getEventsRef().setValue(event)
-                        .addOnSuccessListener(aVoid -> {
-                            // Data has been successfully written to the database
-                            Toast.makeText(RegisterEventActivity.this, "Event data saved", Toast.LENGTH_SHORT).show();
-                        })
-                        .addOnFailureListener(e -> {
-                            // Handle any errors that occurred during the write operation
-                            Toast.makeText(RegisterEventActivity.this, "Error saving event data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle any errors that occurred during the data retrieval
-                Toast.makeText(RegisterEventActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 }

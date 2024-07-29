@@ -9,24 +9,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 
 import org.kulkarni_sampada.neuquest.firebase.AuthConnector;
-import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
+import org.kulkarni_sampada.neuquest.firebase.repository.database.UserRepository;
 import org.kulkarni_sampada.neuquest.model.User;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class SignUpActivity extends AppCompatActivity {
     private EditText nameEditText, emailEditText, passwordEditText;
     private String uid, name;
-    private DatabaseConnector databaseConnector = new DatabaseConnector();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,17 +41,17 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void addUserToDatabase() {
         // Creating a user
-        List<String> tripList = new ArrayList<>();
-        tripList.add("Sample Trip");
         User currentUser = new User();
         currentUser.setName(name);
         currentUser.setUserID(uid);
-        currentUser.setTrips(tripList);
+        currentUser.setTrips(new ArrayList<>());
+        currentUser.setProfileImage("user_profile.png");
 
         // Get a reference to the user's data in the database
-        DatabaseReference userRef = databaseConnector.getUsersRef().child(currentUser.getUserID());
+        UserRepository userRepository = new UserRepository(uid);
+        DatabaseReference userRef = userRepository.getUserRef();
 
-        // Save user in the database;
+        // Save user in the database
         userRef.setValue(currentUser);
     }
 

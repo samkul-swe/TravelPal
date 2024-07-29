@@ -13,21 +13,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
+import org.kulkarni_sampada.neuquest.firebase.repository.database.UserRepository;
+import org.kulkarni_sampada.neuquest.model.Trip;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 public class PlanningTripActivity extends AppCompatActivity {
@@ -39,7 +35,6 @@ public class PlanningTripActivity extends AppCompatActivity {
     private Button submitButton;
 
     private String uid;
-    private DatabaseReference firebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +47,6 @@ public class PlanningTripActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
-
-        firebaseDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     private void bindViews() {
@@ -139,56 +132,32 @@ public class PlanningTripActivity extends AppCompatActivity {
     private void setupSubmitButton() {
         submitButton.setOnClickListener(v -> {
             // Handle submit button click
-            float minBudget = budgetRangeSlider.getValues().get(0);
-            float maxBudget = budgetRangeSlider.getValues().get(1);
-            boolean includesMeals = mealsCheckbox.isChecked();
-            boolean includesTransport = transportCheckbox.isChecked();
-            String eventLocation = eventLocationEditText.getText().toString();
-            String eventStartTime = Objects.requireNonNull(eventStartTimeEditText.getText()).toString();
-            String eventEndTime = Objects.requireNonNull(eventEndTimeEditText.getText()).toString();
-            String eventStartDate = Objects.requireNonNull(eventStartDateEditText.getText()).toString();
-            String eventEndDate = Objects.requireNonNull(eventEndDateEditText.getText()).toString();
 
-            // Create a map with the data you want to set
-            Map<String,String> itinerary = new HashMap<>();
-            itinerary.put("minBudget", String.valueOf(minBudget));
-            itinerary.put("maxBudget", String.valueOf(maxBudget));
-            itinerary.put("mealsIncluded", String.valueOf(includesMeals));
-            itinerary.put("transportIncluded", String.valueOf(includesTransport));
+            Trip trip = new Trip();
 
-            long currentTimestamp = System.currentTimeMillis();
+            trip.setMinBudget(String.valueOf(budgetRangeSlider.getValues().get(0)));
+            trip.setMaxBudget(String.valueOf(budgetRangeSlider.getValues().get(1)));
+            trip.setMealsIncluded(String.valueOf(mealsCheckbox.isChecked()));
+            trip.setTransportIncluded(String.valueOf(transportCheckbox.isChecked()));
+            trip.setLocation(eventLocationEditText.getText().toString());
+            trip.setStartDate(Objects.requireNonNull(eventStartTimeEditText.getText()).toString());
+            trip.setEndTime(Objects.requireNonNull(eventEndTimeEditText.getText()).toString());
+            trip.setStartDate(Objects.requireNonNull(eventStartDateEditText.getText()).toString());
+            trip.setEndDate(Objects.requireNonNull(eventEndDateEditText.getText()).toString());
+            trip.setTripID(String.valueOf(System.currentTimeMillis()));
+
 
             // Get a reference to the user's data in the database
-            DatabaseReference itineraryRef = firebaseDatabase.child("Users").child(uid).child("itinerary").child(String.valueOf(currentTimestamp));
+            UserRepository userRepository = new UserRepository(uid);
+            DatabaseReference userRef = userRepository.getUserRef();
+            DatabaseReference itineraryRef = userRef.child("itinerary").child(trip.getTripID());
 
             // Check if the user's UID already exists in the database
-            itineraryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (!snapshot.exists()) {
-                        // The user's UID does not exist, so create a new entry
-                        itineraryRef.setValue(itinerary)
-                                .addOnSuccessListener(aVoid -> {
-                                    // Data has been successfully written to the database
-                                    Toast.makeText(PlanningTripActivity.this, "Data saved successfully!", Toast.LENGTH_SHORT).show();
-
-                                    Intent intent = new Intent(PlanningTripActivity.this, RightNowActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Handle any errors that occurred during the write operation
-                                    Toast.makeText(PlanningTripActivity.this, "Error saving user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    // Handle any errors that occurred during the data retrieval
-                    Toast.makeText(PlanningTripActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+            itineraryRef.setValue(trip);
+            Toast.makeText(PlanningTripActivity.this, "Trip added to Itinerary", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(PlanningTripActivity.this, AddEventsActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
 }

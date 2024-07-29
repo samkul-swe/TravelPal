@@ -19,6 +19,7 @@ import java.util.List;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
     private List<Event> events;
     private EventAdapter.OnItemClickListener listener;
+    private EventAdapter.OnItemSelectListener selectListener;
 
     public EventAdapter() {}
 
@@ -38,6 +39,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         void onItemClick(Event event);
     }
 
+    public interface OnItemSelectListener {
+        void onItemSelect(Event event);
+    }
+
+    public void setOnItemSelectListener(EventAdapter.OnItemSelectListener listener) {
+        this.selectListener = listener;
+    }
+
     public void setOnItemClickListener(EventAdapter.OnItemClickListener listener) {
         this.listener = listener;
     }
@@ -49,6 +58,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         holder.titleTextView.setText(event.getTitle());
         holder.descriptionTextView.setText(event.getDescription());
         holder.itemView.setOnClickListener(v -> handleEventClick(event));
+        holder.itemView.setOnLongClickListener(v -> {
+            handleEventSelect(event);
+            return true;
+        });
     }
 
     @Override
@@ -60,6 +73,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         // Handle the event click event
         if (listener != null) {
             listener.onItemClick(event);
+        }
+    }
+
+    private void handleEventSelect(Event event) {
+        if (selectListener != null) {
+            selectListener.onItemSelect(event);
         }
     }
 

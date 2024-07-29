@@ -2,7 +2,6 @@ package org.kulkarni_sampada.neuquest;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,8 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
-import org.kulkarni_sampada.neuquest.firebase.repository.EventRepository;
+import org.kulkarni_sampada.neuquest.firebase.repository.database.EventRepository;
 import org.kulkarni_sampada.neuquest.model.Event;
 import org.kulkarni_sampada.neuquest.recycler.EventAdapter;
 
@@ -32,7 +30,7 @@ public class RightNowActivity extends AppCompatActivity {
 
         eventAdapter = new EventAdapter();
         EventRepository eventRepository = new EventRepository();
-        eventRepository.getEvent("");
+        allEvents = eventRepository.getEvents();
 
         // Find the buttons
         FloatingActionButton registerEventButton = findViewById(R.id.register_button);

@@ -1,5 +1,6 @@
 package org.kulkarni_sampada.neuquest.recycler;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
 
         ListenableFuture<GenerateContentResponse> response = geminiClient.getModel().generateContent(content);
 
+        Log.e("Gemini", response.toString());
         return response.toString();
     }
 

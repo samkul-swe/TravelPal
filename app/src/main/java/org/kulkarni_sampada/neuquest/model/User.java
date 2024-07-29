@@ -1,12 +1,12 @@
 package org.kulkarni_sampada.neuquest.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class User {
     private String userID;
     private String name;
     private List<String> plannedTrips; // list of trip IDs
+    private String profileImage;
 
     public User(){}
 
@@ -32,5 +32,13 @@ public class User {
 
     public void setTrips(List<String> plannedTrips) {
         this.plannedTrips = plannedTrips;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

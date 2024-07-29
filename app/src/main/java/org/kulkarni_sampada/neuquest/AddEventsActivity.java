@@ -2,21 +2,15 @@ package org.kulkarni_sampada.neuquest;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-
-import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
+import org.kulkarni_sampada.neuquest.firebase.repository.database.EventRepository;
 import org.kulkarni_sampada.neuquest.model.Event;
 import org.kulkarni_sampada.neuquest.recycler.EventAdapter;
 
@@ -26,13 +20,11 @@ import java.util.List;
 public class AddEventsActivity extends AppCompatActivity {
     private List<Event> eventData, selectedEvents;
     private EventAdapter eventAdapter;
-    private DatabaseConnector databaseConnector = new DatabaseConnector();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_events);
-
 
         eventAdapter = new EventAdapter();
 
@@ -54,8 +46,8 @@ public class AddEventsActivity extends AppCompatActivity {
             }
         });
 
-        // Fetch the data from the database
-        fetchDataFromDatabase();
+        EventRepository eventRepository = new EventRepository();
+        eventData = eventRepository.getEvents();
     }
 
     public void confirmSelection(View view) {
@@ -80,44 +72,6 @@ public class AddEventsActivity extends AppCompatActivity {
         eventAdapter.updateData(filteredEvents);
     }
 
-    private void fetchDataFromDatabase() {
-        eventData = new ArrayList<>();
-
-        databaseConnector.getEventsRef().addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Clear the previous data
-                eventData.clear();
-
-                // Iterate through the data snapshot and add the user data to the list
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    String title = childSnapshot.child("title").getValue(String.class);
-                    String image = childSnapshot.child("image").getValue(String.class);
-                    String description = childSnapshot.child("description").getValue(String.class);
-                    String startTime = childSnapshot.child("startTime").getValue(String.class);
-                    String startDate = childSnapshot.child("startDate").getValue(String.class);
-                    String endTime = childSnapshot.child("endTime").getValue(String.class);
-                    String endDate = childSnapshot.child("endDate").getValue(String.class);
-                    String price = childSnapshot.child("price").getValue(String.class);
-                    String location = childSnapshot.child("location").getValue(String.class);
-                    String registrationLink = childSnapshot.child("registerLink").getValue(String.class);
-
-                    Event event = new Event(title, startTime, startDate, endTime, endDate, description, price, location, image, registrationLink);
-                    eventData.add(event);
-                }
-
-                // Update the UI with the sorted data
-                updateUI();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle any errors that occurred while fetching the data
-                Log.e("Firebase", "Error fetching data: " + error.getMessage());
-            }
-        });
-    }
-
     private void updateUI() {
         selectedEvents = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
@@ -127,6 +81,13 @@ public class AddEventsActivity extends AppCompatActivity {
             intent.putExtra("event", event);
             startActivity(intent);
             finish();
+        });
+        eventAdapter.setOnItemSelectListener((event) -> {
+            if (selectedEvents.contains(event)) {
+                selectedEvents.remove(event);
+            } else {
+                selectedEvents.add(event);
+            }
         });
         recyclerView.setAdapter(eventAdapter);
     }

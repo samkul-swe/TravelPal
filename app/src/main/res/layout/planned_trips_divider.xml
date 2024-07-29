@@ -8,6 +8,7 @@
     android:paddingEnd="16dp">
 
     <TextView
+        android:id="@+id/planned_trips_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/planned_trips"

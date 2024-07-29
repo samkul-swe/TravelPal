@@ -19,21 +19,9 @@ public class Event implements Serializable {
     private String registerLink;
     private String image;
     private String eventID;
+    private String createdBy;
 
     public Event() {}
-
-    public Event(String title, String startTime, String startDate, String endTime, String endDate, String description, String price, String location, String image, String registrationLink) {
-        this.title = title;
-        this.startTime = startTime;
-        this.startDate = startDate;
-        this.endTime = endTime;
-        this.endDate = endDate;
-        this.description = description;
-        this.price = price;
-        this.location = location;
-        this.image = image;
-        this.registerLink = registrationLink;
-    }
 
     public void setEventID(String eventID) {
         this.eventID = eventID;
@@ -87,11 +75,8 @@ public class Event implements Serializable {
         return description;
     }
 
-    public Uri getImage() {
-
-        Task<Uri> urlTask = FirebaseStorage.getInstance().getReference().child(this.image).getDownloadUrl();
-        while (!urlTask.isSuccessful());
-        return urlTask.getResult();
+    public String getImage() {
+        return image;
     }
 
     public String getStartTime() {
@@ -124,6 +109,14 @@ public class Event implements Serializable {
 
     public String getEventID() {
         return eventID;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }
 

@@ -112,16 +112,8 @@ public class Trip implements Serializable {
         return maxBudget;
     }
 
-    public boolean isMealsIncluded() {
-        return Boolean.parseBoolean(mealsIncluded);
-    }
-
     public String getMinBudget() {
         return minBudget;
-    }
-
-    public boolean isTransportIncluded() {
-        return Boolean.parseBoolean(transportIncluded);
     }
 
     public String getTripID(){
