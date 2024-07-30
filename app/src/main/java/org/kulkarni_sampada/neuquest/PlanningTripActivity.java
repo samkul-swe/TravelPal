@@ -19,6 +19,7 @@ import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 
+import org.kulkarni_sampada.neuquest.firebase.repository.database.TripRepository;
 import org.kulkarni_sampada.neuquest.firebase.repository.database.UserRepository;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
@@ -150,7 +151,11 @@ public class PlanningTripActivity extends AppCompatActivity {
             // Get a reference to the user's data in the database
             UserRepository userRepository = new UserRepository(uid);
             DatabaseReference userRef = userRepository.getUserRef();
-            DatabaseReference itineraryRef = userRef.child("itinerary").child(trip.getTripID());
+            DatabaseReference userItineraryRef = userRef.child("itinerary").push();
+            userItineraryRef.setValue(trip.getTripID());
+
+            TripRepository tripRepository = new TripRepository();
+            DatabaseReference itineraryRef = tripRepository.getTripRef().child(trip.getTripID());
 
             // Check if the user's UID already exists in the database
             itineraryRef.setValue(trip);
@@ -159,5 +164,13 @@ public class PlanningTripActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(PlanningTripActivity.this, UserProfileActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

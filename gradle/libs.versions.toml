@@ -1,8 +1,10 @@
 [versions]
 agp = "8.5.0"
+core = "1.13.1"
 firebaseBom = "33.1.2"
 firebaseDatabaseKtx = "21.0.0"
 generativeai = "0.9.0"
+guava = "31.1-android"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -13,14 +15,18 @@ constraintlayout = "2.1.4"
 materialVersion = "1.3.0-alpha02"
 picasso = "2.71828"
 secretsGradlePlugin = "2.0.1"
+espressoWeb = "3.6.1"
 
 [libraries]
+core = { module = "androidx.core:core", version.ref = "core" }
+core-ktx = { module = "androidx.core:core-ktx" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-database = { module = "com.google.firebase:firebase-database", version.ref = "firebaseDatabaseKtx" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
 generativeai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "generativeai" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -31,6 +37,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 material-v130alpha02 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+espresso-web = { group = "androidx.test.espresso", name = "espresso-web", version.ref = "espressoWeb" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

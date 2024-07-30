@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.espresso.web)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -55,4 +56,5 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.generativeai)
     implementation(libs.material.v130alpha02)
+    implementation(libs.guava)
 }

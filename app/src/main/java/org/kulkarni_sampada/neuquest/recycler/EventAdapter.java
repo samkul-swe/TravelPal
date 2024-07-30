@@ -1,5 +1,6 @@
 package org.kulkarni_sampada.neuquest.recycler;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import org.kulkarni_sampada.neuquest.R;
+import org.kulkarni_sampada.neuquest.firebase.repository.storage.EventImageRepository;
 import org.kulkarni_sampada.neuquest.model.Event;
 
 import java.util.List;
@@ -54,7 +56,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = events.get(position);
-        Picasso.get().load(event.getImage()).into(holder.imageView);
+
+        Log.d("Event image", event.getImage());
+
+        EventImageRepository eventImageRepository = new EventImageRepository();
+
+        Picasso.get().load(eventImageRepository.getEventImage(event.getImage())).into(holder.imageView);
         holder.titleTextView.setText(event.getTitle());
         holder.descriptionTextView.setText(event.getDescription());
         holder.itemView.setOnClickListener(v -> handleEventClick(event));

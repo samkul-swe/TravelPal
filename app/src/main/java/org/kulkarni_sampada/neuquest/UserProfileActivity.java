@@ -2,23 +2,23 @@ package org.kulkarni_sampada.neuquest;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.OnBackPressedDispatcher;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Picasso;
 
@@ -38,9 +38,11 @@ public class UserProfileActivity extends AppCompatActivity {
     private ImageView userProfileImage;
     private Uri imageUri;
     private String uid;
-
-    private long backPressedTime = 0;
-    private static final long BACK_PRESS_INTERVAL = 2000; // 2 seconds
+    private User user;
+    private UserRepository userRepository;
+    private UserProfileRepository userProfileRepo;
+    private TextView userNameTextView;
+    private List<Trip> trips;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,53 +53,28 @@ public class UserProfileActivity extends AppCompatActivity {
         userProfileImage = findViewById(R.id.user_profile_image);
         userProfileImage.setOnClickListener(v -> pickImage());
 
+        // Get the current user's ID
+        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
+
+
+        userRepository = new UserRepository(uid);
+        userProfileRepo = new UserProfileRepository(uid);
+
+        userNameTextView = findViewById(R.id.user_name);
+        TextView changeProfileImageTextView = findViewById(R.id.change_profile_image);
+
+        // Set the click listener on the "Change Profile Image" TextView
+        changeProfileImageTextView.setOnClickListener(v -> pickImage());
+
+        getUser(uid);
+
         TextView plannedTripsTextView = findViewById(R.id.planned_trips_title);
         plannedTripsTextView.setOnClickListener(v -> {
             Intent intent = new Intent(UserProfileActivity.this, PlanningTripActivity.class);
             startActivity(intent);
             finish();
         });
-
-        // Get the current user's ID
-        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
-
-        TextView userNameTextView = findViewById(R.id.user_name);
-        TextView changeProfileImageTextView = findViewById(R.id.change_profile_image);
-
-        UserProfileRepository userProfileRepo = new UserProfileRepository(uid);
-
-        // Use the user object
-        UserRepository userRepository = new UserRepository(uid);
-        TripRepository tripRepository = new TripRepository();
-        List<Trip> trips = new ArrayList<>();
-
-        User user = userRepository.getUser(uid);
-        userNameTextView.setText(user.getName());
-
-        // Set the click listener on the "Change Profile Image" TextView
-        changeProfileImageTextView.setOnClickListener(v -> pickImage());
-
-        String profileImageURL = user.getProfileImage();
-        Uri profileImageUri = userProfileRepo.getProfileImage(profileImageURL);
-        Picasso.get().load(profileImageUri).into(userProfileImage);
-
-        if (user.getTrips() != null) {
-            for (String tripID : user.getTrips()) {
-                trips.add(tripRepository.getTrip(tripID));
-            }
-
-            RecyclerView tripRecyclerView = findViewById(R.id.trips_recycler_view);
-            tripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            TripAdapter tripAdapter = new TripAdapter(trips);
-            tripAdapter.setOnItemClickListener((trip) -> {
-                Intent intent = new Intent(UserProfileActivity.this, TripDetailsActivity.class);
-                intent.putExtra("trip", trip);
-                startActivity(intent);
-                finish();
-            });
-            tripRecyclerView.setAdapter(tripAdapter);
-        }
 
         launcher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -137,5 +114,90 @@ public class UserProfileActivity extends AppCompatActivity {
                 | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         launcher.launch(intent);
+    }
+
+    public void getUser(String uid) {
+
+        user = new User();
+        user.setUserID(uid);
+
+        Task<DataSnapshot> task = userRepository.getUserRef().get();
+        task.addOnSuccessListener(dataSnapshot -> {
+            if (dataSnapshot.exists()) {
+                user.setName(dataSnapshot.child("name").getValue(String.class));
+                user.setProfileImage(dataSnapshot.child("profileImage").getValue(String.class));
+                List<String> tripIDs = new ArrayList<>();
+                for (DataSnapshot tripSnapshot : dataSnapshot.child("itinerary").getChildren()) {
+                    String tripID = String.valueOf(tripSnapshot.getValue(long.class));
+                    tripIDs.add(tripID);
+                }
+                user.setTrips(tripIDs);
+                updateUI();
+            }
+        }).addOnFailureListener(e -> {
+            // Handle any exceptions that occur during the database query
+            Log.e("UserRepository", "Error retrieving user data: " + e.getMessage());
+        });
+    }
+
+    public void updateUI() {
+
+        assert user != null;
+        userNameTextView.setText(user.getName());
+
+        Uri profileImageUri = userProfileRepo.getProfileImage(user.getProfileImage());
+        Picasso.get().load(profileImageUri).into(userProfileImage);
+
+        if (user.getTrips() != null) {
+            getTrips();
+        }
+    }
+
+    public void getTrips() {
+
+        TripRepository tripRepository = new TripRepository();
+        trips = new ArrayList<>();
+
+        Task<DataSnapshot> task = tripRepository.getTripRef().get();
+        task.addOnSuccessListener(dataSnapshot -> {
+            if (dataSnapshot.exists()) {
+
+                for (String tripID : user.getTrips()) {
+                    Trip trip = new Trip();
+                    trip.setTripID(tripID);
+                    trip.setMinBudget(dataSnapshot.child("minBudget").getValue(String.class));
+                    trip.setMaxBudget(dataSnapshot.child("maxBudget").getValue(String.class));
+                    trip.setMealsIncluded(dataSnapshot.child("mealsIncluded").getValue(String.class));
+                    trip.setTransportIncluded(dataSnapshot.child("transportIncluded").getValue(String.class));
+                    trip.setLocation(dataSnapshot.child("location").getValue(String.class));
+                    trip.setStartDate(dataSnapshot.child("startDate").getValue(String.class));
+                    trip.setStartTime(dataSnapshot.child("startTime").getValue(String.class));
+                    trip.setEndDate(dataSnapshot.child("endDate").getValue(String.class));
+                    trip.setEndTime(dataSnapshot.child("endTime").getValue(String.class));
+                    List<String> eventIDs = new ArrayList<>();
+                    for (DataSnapshot eventSnapshot : dataSnapshot.child("eventIDs").getChildren()) {
+                        String eventID = eventSnapshot.getValue(String.class);
+                        eventIDs.add(eventID);
+                    }
+                    trip.setEventIDs(eventIDs);
+                    trips.add(trip);
+                }
+                Log.e("UserRepository", "Trip data : " + trips);
+
+                RecyclerView tripRecyclerView = findViewById(R.id.trips_recycler_view);
+                tripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                TripAdapter tripAdapter = new TripAdapter(trips);
+                tripAdapter.setOnItemClickListener((trip) -> {
+                    Intent intent = new Intent(UserProfileActivity.this, TripDetailsActivity.class);
+                    intent.putExtra("trip", trip);
+                    startActivity(intent);
+                    finish();
+                });
+                tripRecyclerView.setAdapter(tripAdapter);
+            }
+        }).addOnFailureListener(e -> {
+        // Handle any exceptions that occur during the database query
+        e.printStackTrace();
+        });
     }
 }

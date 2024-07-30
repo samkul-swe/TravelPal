@@ -47,7 +47,7 @@ public class AddEventsActivity extends AppCompatActivity {
         });
 
         EventRepository eventRepository = new EventRepository();
-        eventData = eventRepository.getEvents();
+        eventData = new ArrayList<>(); //change this later
     }
 
     public void confirmSelection(View view) {
