@@ -7,23 +7,34 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.database.DatabaseReference;
 
 import org.kulkarni_sampada.neuquest.firebase.repository.database.UserRepository;
+import org.kulkarni_sampada.neuquest.gemini.GeminiClient;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PlanningTripActivity extends AppCompatActivity {
     private RangeSlider budgetRangeSlider;
@@ -131,30 +142,55 @@ public class PlanningTripActivity extends AppCompatActivity {
     private void setupSubmitButton() {
         submitButton.setOnClickListener(v -> {
             // Handle submit button click
-
             Trip trip = new Trip();
 
-            trip.setMinBudget(String.valueOf(budgetRangeSlider.getValues().get(0)));
-            trip.setMaxBudget(String.valueOf(budgetRangeSlider.getValues().get(1)));
-            trip.setMealsIncluded(String.valueOf(mealsCheckbox.isChecked()));
-            trip.setTransportIncluded(String.valueOf(transportCheckbox.isChecked()));
-            trip.setLocation(eventLocationEditText.getText().toString());
-            trip.setStartDate(Objects.requireNonNull(eventStartTimeEditText.getText()).toString());
-            trip.setEndTime(Objects.requireNonNull(eventEndTimeEditText.getText()).toString());
-            trip.setStartDate(Objects.requireNonNull(eventStartDateEditText.getText()).toString());
-            trip.setEndDate(Objects.requireNonNull(eventEndDateEditText.getText()).toString());
-            trip.setTripID(String.valueOf(System.currentTimeMillis()));
+            // Create a ThreadPoolExecutor
+            int numThreads = Runtime.getRuntime().availableProcessors();
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 
+            GeminiClient geminiClient = new GeminiClient();
+            ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult("Give me just one trip name for a trip starting on " + trip.getStartDate() + " to " + trip.getLocation());
 
-            // Get a reference to the user's data in the database
-            UserRepository userRepository = new UserRepository(uid);
-            DatabaseReference userRef = userRepository.getUserRef();
-            DatabaseReference userItineraryRef = userRef.child("itinerary").push();
-            userItineraryRef.setValue(trip.getTripID());
-            Intent intent = new Intent(PlanningTripActivity.this, AddEventsActivity.class);
-            intent.putExtra("trip", trip);
-            startActivity(intent);
-            finish();
+            // Generate trip name using Gemini API
+            Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+                @SuppressLint("RestrictedApi")
+                @Override
+                public void onSuccess(GenerateContentResponse result) {
+                    Log.e("TripAdapter", "Success");
+                    Pattern pattern = Pattern.compile("\\*\\*(.+?)\\*\\*");
+                    Matcher matcher = pattern.matcher(result.getText());
+                    if(matcher.find()) {
+                        trip.setTitle(matcher.group(1));
+
+                        trip.setMinBudget(String.valueOf(budgetRangeSlider.getValues().get(0)));
+                        trip.setMaxBudget(String.valueOf(budgetRangeSlider.getValues().get(1)));
+                        trip.setMealsIncluded(String.valueOf(mealsCheckbox.isChecked()));
+                        trip.setTransportIncluded(String.valueOf(transportCheckbox.isChecked()));
+                        trip.setLocation(eventLocationEditText.getText().toString());
+                        trip.setStartDate(Objects.requireNonNull(eventStartTimeEditText.getText()).toString());
+                        trip.setEndTime(Objects.requireNonNull(eventEndTimeEditText.getText()).toString());
+                        trip.setStartDate(Objects.requireNonNull(eventStartDateEditText.getText()).toString());
+                        trip.setEndDate(Objects.requireNonNull(eventEndDateEditText.getText()).toString());
+                        trip.setTripID(String.valueOf(System.currentTimeMillis()));
+
+                        // Get a reference to the user's data in the database
+                        UserRepository userRepository = new UserRepository(uid);
+                        DatabaseReference userRef = userRepository.getUserRef();
+                        DatabaseReference userItineraryRef = userRef.child("itinerary").push();
+                        userItineraryRef.setValue(trip.getTripID());
+                        Intent intent = new Intent(PlanningTripActivity.this, AddEventsActivity.class);
+                        intent.putExtra("trip", trip);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    // Handle the failure on the main thread
+                    Log.e("TripAdapter", "Error: " + t.getMessage());
+                }
+            }, executor);
         });
     }
 

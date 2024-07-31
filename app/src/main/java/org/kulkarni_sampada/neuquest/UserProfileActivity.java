@@ -166,6 +166,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 for (String tripID : user.getTrips()) {
                     Trip trip = new Trip();
                     trip.setTripID(tripID);
+                    trip.setTitle(dataSnapshot.child(tripID).child("title").getValue(String.class));
                     trip.setMinBudget(dataSnapshot.child(tripID).child("minBudget").getValue(String.class));
                     trip.setMaxBudget(dataSnapshot.child(tripID).child("maxBudget").getValue(String.class));
                     trip.setMealsIncluded(dataSnapshot.child(tripID).child("mealsIncluded").getValue(String.class));
@@ -181,11 +182,10 @@ public class UserProfileActivity extends AppCompatActivity {
                         eventIDs.add(eventID);
                     }
                     trip.setEventIDs(eventIDs);
-                    Log.e("UserRepository", "Trip data : " + trip.getTripID());
                     trips.add(trip);
-                }
-                Log.e("UserRepository", "Trip data : " + trips);
+                    }
 
+                // Setup recycler view and show all trips
                 RecyclerView tripRecyclerView = findViewById(R.id.trips_recycler_view);
                 tripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
                 TripAdapter tripAdapter = new TripAdapter(trips);

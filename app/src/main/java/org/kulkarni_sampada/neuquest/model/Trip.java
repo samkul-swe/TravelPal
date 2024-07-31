@@ -14,11 +14,12 @@ public class Trip implements Serializable {
     private String endDate;
     private String endTime;
     private String tripID;
+    private String title;
     private List<String> eventIDs;
 
     public Trip() {}
 
-    public Trip(String tripID, String minBudget, String maxBudget, String mealsIncluded, String transportIncluded, List<String> eventIDs, String startDate, String startTime, String endDate, String endTime, String location) {
+    public Trip(String tripID, String minBudget, String maxBudget, String mealsIncluded, String transportIncluded, List<String> eventIDs, String startDate, String startTime, String endDate, String endTime, String location, String title) {
         this.tripID = tripID;
         this.minBudget = minBudget;
         this.maxBudget = maxBudget;
@@ -30,6 +31,15 @@ public class Trip implements Serializable {
         this.endDate = endDate;
         this.endTime = endTime;
         this.location = location;
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getMealsIncluded() {

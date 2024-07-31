@@ -54,40 +54,11 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Trip trip = trips.get(position);
 
-        // Create a ThreadPoolExecutor
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
+        holder.tripNameTextView.setText(trip.getTitle());
+        holder.tripDateTextView.setText(trip.getStartDate());
+        holder.tripDestinationTextView.setText(trip.getLocation());
+        holder.itemView.setOnClickListener(v -> handleTripClick(trip));
 
-        // Create a GeminiClient instance
-        GeminiClient geminiClient = new GeminiClient();
-        ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult("Give me just one trip name for a trip starting on " + trip.getStartDate() + " to " + trip.getLocation());
-
-        // Generate trip name using Gemini API
-        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onSuccess(GenerateContentResponse result) {
-                Log.e("TripAdapter", "Success");
-
-                Pattern pattern = Pattern.compile("\\*\\*(.+?)\\*\\*");
-                Matcher matcher = pattern.matcher(result.getText());
-
-                if (matcher.find()) {
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        holder.tripNameTextView.setText(matcher.group(1));
-                        holder.tripDateTextView.setText(trip.getStartDate());
-                        holder.tripDestinationTextView.setText(trip.getLocation());
-                        holder.itemView.setOnClickListener(v -> handleTripClick(trip));
-                    });
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Throwable t) {
-                // Handle the failure on the main thread
-                Log.e("TripAdapter", "Error: " + t.getMessage());
-            }
-        }, executor);
     }
 
     @Override

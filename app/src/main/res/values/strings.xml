@@ -53,4 +53,5 @@
     <string name="search">Search</string>
     <string name="show_location">Show Location</string>
     <string name="confirm_selection">Confirm Selection</string>
+    <string name="user_profile">User Profile</string>
 </resources>

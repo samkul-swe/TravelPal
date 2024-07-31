@@ -42,8 +42,10 @@ public class TripDetailsActivity extends AppCompatActivity {
         TextView tripNameTextView = findViewById(R.id.trip_name);
         TextView tripBudgetTextView = findViewById(R.id.trip_budget);
         TextView tripPreferencesTextView = findViewById(R.id.trip_preferences);
+        TextView tripTimeTextView = findViewById(R.id.trip_time);
 
-        tripNameTextView.setText(getCurrentTimeString(Long.parseLong(trip.getTripID())));
+        tripNameTextView.setText(trip.getTitle());
+        tripTimeTextView.setText(getCurrentTimeString(Long.parseLong(trip.getTripID())));
         tripBudgetTextView.setText("Budget from $" + trip.getMinBudget() + " - $" + trip.getMaxBudget());
         boolean mealsIncluded = Boolean.parseBoolean(trip.getMealsIncluded());
         boolean transportIncluded = Boolean.parseBoolean(trip.getTransportIncluded());
