@@ -165,21 +165,22 @@ public class UserProfileActivity extends AppCompatActivity {
                 for (String tripID : user.getTrips()) {
                     Trip trip = new Trip();
                     trip.setTripID(tripID);
-                    trip.setMinBudget(dataSnapshot.child("minBudget").getValue(String.class));
-                    trip.setMaxBudget(dataSnapshot.child("maxBudget").getValue(String.class));
-                    trip.setMealsIncluded(dataSnapshot.child("mealsIncluded").getValue(String.class));
-                    trip.setTransportIncluded(dataSnapshot.child("transportIncluded").getValue(String.class));
-                    trip.setLocation(dataSnapshot.child("location").getValue(String.class));
-                    trip.setStartDate(dataSnapshot.child("startDate").getValue(String.class));
-                    trip.setStartTime(dataSnapshot.child("startTime").getValue(String.class));
-                    trip.setEndDate(dataSnapshot.child("endDate").getValue(String.class));
-                    trip.setEndTime(dataSnapshot.child("endTime").getValue(String.class));
+                    trip.setMinBudget(dataSnapshot.child(tripID).child("minBudget").getValue(String.class));
+                    trip.setMaxBudget(dataSnapshot.child(tripID).child("maxBudget").getValue(String.class));
+                    trip.setMealsIncluded(dataSnapshot.child(tripID).child("mealsIncluded").getValue(String.class));
+                    trip.setTransportIncluded(dataSnapshot.child(tripID).child("transportIncluded").getValue(String.class));
+                    trip.setLocation(dataSnapshot.child(tripID).child("location").getValue(String.class));
+                    trip.setStartDate(dataSnapshot.child(tripID).child("startDate").getValue(String.class));
+                    trip.setStartTime(dataSnapshot.child(tripID).child("startTime").getValue(String.class));
+                    trip.setEndDate(dataSnapshot.child(tripID).child("endDate").getValue(String.class));
+                    trip.setEndTime(dataSnapshot.child(tripID).child("endTime").getValue(String.class));
                     List<String> eventIDs = new ArrayList<>();
-                    for (DataSnapshot eventSnapshot : dataSnapshot.child("eventIDs").getChildren()) {
+                    for (DataSnapshot eventSnapshot : dataSnapshot.child(tripID).child("eventIDs").getChildren()) {
                         String eventID = eventSnapshot.getValue(String.class);
                         eventIDs.add(eventID);
                     }
                     trip.setEventIDs(eventIDs);
+                    Log.e("UserRepository", "Trip data : " + trip.getTripID());
                     trips.add(trip);
                 }
                 Log.e("UserRepository", "Trip data : " + trips);

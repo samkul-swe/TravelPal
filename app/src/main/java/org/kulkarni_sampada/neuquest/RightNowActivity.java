@@ -1,9 +1,7 @@
 package org.kulkarni_sampada.neuquest;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AlertDialog;

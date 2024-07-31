@@ -1,10 +1,5 @@
 package org.kulkarni_sampada.neuquest.model;
 
-import android.net.Uri;
-
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.FirebaseStorage;
-
 import java.io.Serializable;
 
 public class Event implements Serializable {

@@ -1,5 +1,8 @@
 package org.kulkarni_sampada.neuquest.recycler;
 
+import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.ai.client.generativeai.type.Content;
 import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -19,14 +21,12 @@ import org.kulkarni_sampada.neuquest.gemini.GeminiClient;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     private final List<Trip> trips;
     private TripAdapter.OnItemClickListener listener;
-    private String tripName;
 
     public TripAdapter(List<Trip> trips) {
         this.trips = trips;
@@ -48,49 +48,38 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
         this.listener = listener;
     }
 
-    private void generateTripName(String startDate, String location) {
-        GeminiClient geminiClient = new GeminiClient();
-
-        Content content = new Content.Builder()
-                .addText("Give me a unique trip name for a trip to " + location + " starting on " + startDate + ".")
-                .build();
-
-        // Create a ThreadPoolExecutor
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                numThreads, numThreads, 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>());
-
-        // Get the ListenableFuture from the model
-        ListenableFuture<GenerateContentResponse> response = geminiClient.getModel().generateContent(content);
-
-        // Add the callback to the ListenableFuture
-        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
-            @Override
-            public void onSuccess(GenerateContentResponse result) {
-                String resultText = result.getText();
-                // Update the UI on the main thread
-                Log.e("TripAdapter", "Result text: " + resultText);
-                tripName = resultText;
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                // Handle the failure on the main thread
-                Log.e("TripAdapter", "Failure: " + t.getMessage());
-            }
-        }, executor);
-    }
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Trip trip = trips.get(position);
-        generateTripName(trip.getStartDate(),trip.getLocation());
 
-        holder.tripNameTextView.setText(tripName);
-        holder.tripDateTextView.setText(trip.getStartDate());
-        holder.tripDestinationTextView.setText(trip.getLocation());
-        holder.itemView.setOnClickListener(v -> handleTripClick(trip));
+        // Create a ThreadPoolExecutor
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
+
+        // Create a GeminiClient instance
+        GeminiClient geminiClient = new GeminiClient();
+        ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult("Give me just one trip name for a trip starting on " + trip.getStartDate() + " to " + trip.getLocation());
+
+        // Generate trip name using Gemini API
+        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onSuccess(GenerateContentResponse result) {
+                Log.e("TripAdapter", "Success");
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    holder.tripNameTextView.setText(result.getText());
+                    holder.tripDateTextView.setText(trip.getStartDate());
+                    holder.tripDestinationTextView.setText(trip.getLocation());
+                    holder.itemView.setOnClickListener(v -> handleTripClick(trip));
+                });
+            }
+
+            @Override
+            public void onFailure(@NonNull Throwable t) {
+                // Handle the failure on the main thread
+                Log.e("TripAdapter", "Error: " + t.getMessage());
+            }
+        }, executor);
     }
 
     @Override

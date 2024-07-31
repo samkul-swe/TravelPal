@@ -9,10 +9,6 @@ import com.google.firebase.database.DatabaseReference;
 import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 import org.kulkarni_sampada.neuquest.model.Event;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 public class EventRepository {
     private final DatabaseReference eventRef;
 

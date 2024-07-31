@@ -8,10 +8,6 @@ public class StorageConnector {
     private static StorageConnector instance;
     private FirebaseStorage firebaseStorage;
 
-    private static StorageReference userProfilesRef;
-    private static StorageReference eventImagesRef;
-    private static final Object lock = new Object();
-
     private StorageConnector() {
         // Initialize the Firebase Realtime Database
         firebaseStorage = FirebaseStorage.getInstance();
