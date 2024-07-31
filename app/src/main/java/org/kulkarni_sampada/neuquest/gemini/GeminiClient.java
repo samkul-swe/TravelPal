@@ -25,8 +25,6 @@ public class GeminiClient {
                 .build();
 
         // Get the ListenableFuture from the model
-        ListenableFuture<GenerateContentResponse> response = geminiClient.getModel().generateContent(content);
-
-        return response;
+        return geminiClient.getModel().generateContent(content);
     }
 }

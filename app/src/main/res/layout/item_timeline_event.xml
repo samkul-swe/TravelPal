@@ -23,8 +23,7 @@
                 android:id="@+id/event_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:layout_marginEnd="16dp" />
+                android:textAppearance="?attr/textAppearanceBody2" />
 
             <View
                 android:layout_width="2dp"
@@ -59,7 +58,6 @@
             android:id="@+id/event_image"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:contentDescription="Event image"
             android:scaleType="centerCrop" />
 
     </LinearLayout>

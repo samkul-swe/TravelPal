@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,7 +18,6 @@ import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 
-import org.kulkarni_sampada.neuquest.firebase.repository.database.TripRepository;
 import org.kulkarni_sampada.neuquest.firebase.repository.database.UserRepository;
 import org.kulkarni_sampada.neuquest.model.Trip;
 
@@ -153,14 +151,8 @@ public class PlanningTripActivity extends AppCompatActivity {
             DatabaseReference userRef = userRepository.getUserRef();
             DatabaseReference userItineraryRef = userRef.child("itinerary").push();
             userItineraryRef.setValue(trip.getTripID());
-
-            TripRepository tripRepository = new TripRepository();
-            DatabaseReference itineraryRef = tripRepository.getTripRef().child(trip.getTripID());
-
-            // Check if the user's UID already exists in the database
-            itineraryRef.setValue(trip);
-            Toast.makeText(PlanningTripActivity.this, "Trip added to Itinerary", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(PlanningTripActivity.this, AddEventsActivity.class);
+            intent.putExtra("trip", trip);
             startActivity(intent);
             finish();
         });

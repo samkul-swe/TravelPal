@@ -5,7 +5,6 @@
     android:id="@+id/show_location_fab"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:contentDescription="Location pin"
     android:src="@drawable/location_pin"
     app:fabSize="normal"
     app:backgroundTint="@color/primary"

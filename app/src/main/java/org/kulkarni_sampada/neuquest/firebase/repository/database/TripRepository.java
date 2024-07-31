@@ -5,7 +5,7 @@ import com.google.firebase.database.DatabaseReference;
 import org.kulkarni_sampada.neuquest.firebase.DatabaseConnector;
 
 public class TripRepository {
-    private DatabaseReference tripRef;
+    private final DatabaseReference tripRef;
 
     public TripRepository() {
         tripRef = DatabaseConnector.getInstance().getTripsReference();

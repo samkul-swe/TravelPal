@@ -5,7 +5,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class DatabaseConnector {
     private static DatabaseConnector instance;
-    private FirebaseDatabase database;
+    private final FirebaseDatabase database;
 
     private DatabaseConnector() {
         // Initialize the Firebase Realtime Database

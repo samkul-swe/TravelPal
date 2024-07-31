@@ -3,7 +3,6 @@ package org.kulkarni_sampada.neuquest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,10 +36,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         FloatingActionButton showLocationButton = findViewById(R.id.show_location_fab);
 
         Event event = (Event) getIntent().getSerializableExtra("event");
-        Log.e("EventsDetailsActivity", "Event: " + event.getEndTime());
+        assert event != null;
 
         // Set the event details in the UI components
-        assert event != null;
         eventNameTextView.setText(event.getTitle());
         eventDescriptionTextView.setText(event.getDescription());
         eventStartDateTextView.setText(event.getStartDate());

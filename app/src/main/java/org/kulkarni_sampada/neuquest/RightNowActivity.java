@@ -69,13 +69,13 @@ public class RightNowActivity extends AppCompatActivity {
         getEvents();
     }
 
-
     public void getEvents() {
         allEvents = new ArrayList<>();
 
         EventRepository eventRepository = new EventRepository();
 
         Task<DataSnapshot> task = eventRepository.getEventRef().get();
+        // Handle any exceptions that occur during the database query
         task.addOnSuccessListener(dataSnapshot -> {
             if (dataSnapshot.exists()) {
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
@@ -95,10 +95,7 @@ public class RightNowActivity extends AppCompatActivity {
                 }
                 updateUI(allEvents);
             }
-        }).addOnFailureListener(e -> {
-            // Handle any exceptions that occur during the database query
-            e.printStackTrace();
-        });
+        }).addOnFailureListener(Throwable::printStackTrace);
     }
 
     private void updateUI(List<Event> events) {

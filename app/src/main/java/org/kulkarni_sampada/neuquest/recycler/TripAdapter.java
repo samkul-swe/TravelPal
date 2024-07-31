@@ -23,6 +23,8 @@ import org.kulkarni_sampada.neuquest.model.Trip;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     private final List<Trip> trips;
@@ -66,12 +68,18 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
             @Override
             public void onSuccess(GenerateContentResponse result) {
                 Log.e("TripAdapter", "Success");
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    holder.tripNameTextView.setText(result.getText());
-                    holder.tripDateTextView.setText(trip.getStartDate());
-                    holder.tripDestinationTextView.setText(trip.getLocation());
-                    holder.itemView.setOnClickListener(v -> handleTripClick(trip));
-                });
+
+                Pattern pattern = Pattern.compile("\\*\\*(.+?)\\*\\*");
+                Matcher matcher = pattern.matcher(result.getText());
+
+                if (matcher.find()) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        holder.tripNameTextView.setText(matcher.group(1));
+                        holder.tripDateTextView.setText(trip.getStartDate());
+                        holder.tripDestinationTextView.setText(trip.getLocation());
+                        holder.itemView.setOnClickListener(v -> handleTripClick(trip));
+                    });
+                }
             }
 
             @Override

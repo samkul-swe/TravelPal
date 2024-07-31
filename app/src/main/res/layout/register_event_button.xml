@@ -5,7 +5,6 @@
     android:id="@+id/register_button"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:contentDescription="Register Event"
     android:src="@drawable/add_event"
     app:fabSize="normal"
     app:backgroundTint="@color/primary"

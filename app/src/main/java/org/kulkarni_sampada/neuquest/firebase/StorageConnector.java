@@ -6,7 +6,7 @@ import com.google.firebase.storage.StorageReference;
 public class StorageConnector {
 
     private static StorageConnector instance;
-    private FirebaseStorage firebaseStorage;
+    private final FirebaseStorage firebaseStorage;
 
     private StorageConnector() {
         // Initialize the Firebase Realtime Database

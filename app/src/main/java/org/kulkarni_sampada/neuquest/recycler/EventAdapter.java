@@ -1,5 +1,6 @@
 package org.kulkarni_sampada.neuquest.recycler;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +67,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         holder.descriptionTextView.setText(event.getDescription());
         holder.itemView.setOnClickListener(v -> handleEventClick(event));
         holder.itemView.setOnLongClickListener(v -> {
+            v.setBackgroundColor(Color.YELLOW);
             handleEventSelect(event);
             return true;
         });

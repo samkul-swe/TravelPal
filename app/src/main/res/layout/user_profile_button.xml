@@ -5,7 +5,6 @@
     android:id="@+id/user_profile_fab"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:contentDescription="User profile"
     android:src="@drawable/profile_pic"
     app:fabSize="normal"
     app:backgroundTint="@color/primary"

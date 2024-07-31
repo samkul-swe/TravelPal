@@ -128,7 +128,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 user.setProfileImage(dataSnapshot.child("profileImage").getValue(String.class));
                 List<String> tripIDs = new ArrayList<>();
                 for (DataSnapshot tripSnapshot : dataSnapshot.child("itinerary").getChildren()) {
-                    String tripID = String.valueOf(tripSnapshot.getValue(long.class));
+                    String tripID = tripSnapshot.getValue(String.class);
                     tripIDs.add(tripID);
                 }
                 user.setTrips(tripIDs);
@@ -159,6 +159,7 @@ public class UserProfileActivity extends AppCompatActivity {
         trips = new ArrayList<>();
 
         Task<DataSnapshot> task = tripRepository.getTripRef().get();
+        // Handle any exceptions that occur during the database query
         task.addOnSuccessListener(dataSnapshot -> {
             if (dataSnapshot.exists()) {
 
@@ -196,9 +197,6 @@ public class UserProfileActivity extends AppCompatActivity {
                 });
                 tripRecyclerView.setAdapter(tripAdapter);
             }
-        }).addOnFailureListener(e -> {
-        // Handle any exceptions that occur during the database query
-        e.printStackTrace();
-        });
+        }).addOnFailureListener(Throwable::printStackTrace);
     }
 }

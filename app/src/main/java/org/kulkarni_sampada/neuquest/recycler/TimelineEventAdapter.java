@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import org.kulkarni_sampada.neuquest.R;
+import org.kulkarni_sampada.neuquest.firebase.repository.storage.EventImageRepository;
 import org.kulkarni_sampada.neuquest.model.Event;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class TimelineEventAdapter extends RecyclerView.Adapter<TimelineEventAdap
     @Override
     public TimelineEventAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_event, parent, false);
+                .inflate(R.layout.item_timeline_event, parent, false);
         return new TimelineEventAdapter.ViewHolder(view);
     }
 
@@ -45,7 +46,9 @@ public class TimelineEventAdapter extends RecyclerView.Adapter<TimelineEventAdap
     @Override
     public void onBindViewHolder(@NonNull TimelineEventAdapter.ViewHolder holder, int position) {
         Event event = events.get(position);
-        Picasso.get().load(event.getImage()).into(holder.imageView);
+        EventImageRepository eventImageRepository = new EventImageRepository();
+
+        Picasso.get().load(eventImageRepository.getEventImage(event.getImage())).into(holder.imageView);
         holder.titleTextView.setText(event.getTitle());
         holder.descriptionTextView.setText(event.getDescription());
         holder.timeTextView.setText(event.getStartTime());
