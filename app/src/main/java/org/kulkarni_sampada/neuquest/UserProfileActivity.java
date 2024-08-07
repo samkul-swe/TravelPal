@@ -127,7 +127,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 user.setName(dataSnapshot.child("name").getValue(String.class));
                 user.setProfileImage(dataSnapshot.child("profileImage").getValue(String.class));
                 List<String> tripIDs = new ArrayList<>();
-                for (DataSnapshot tripSnapshot : dataSnapshot.child("itinerary").getChildren()) {
+                for (DataSnapshot tripSnapshot : dataSnapshot.child("plannedTrips").getChildren()) {
                     String tripID = tripSnapshot.getValue(String.class);
                     tripIDs.add(tripID);
                 }

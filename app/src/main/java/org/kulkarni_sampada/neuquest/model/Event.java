@@ -113,5 +113,9 @@ public class Event implements Serializable {
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
+
+    public String toString() {
+        return title + " " + description + " " + image + " " + startTime + " " + endTime + " " + startDate + " " + endDate + " " + price + " " + location;
+    }
 }
 

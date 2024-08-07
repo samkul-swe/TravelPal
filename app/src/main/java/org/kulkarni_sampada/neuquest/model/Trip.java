@@ -133,4 +133,8 @@ public class Trip implements Serializable {
     public List<String> getEventIDs() {
         return eventIDs;
     }
+
+    public String toString() {
+        return tripID + " " + minBudget + " " + maxBudget + " " + mealsIncluded + " " + transportIncluded + " " + eventIDs + " " + startDate + " " + startTime + " " + endDate + " " + endTime + " " + location;
+    }
 }

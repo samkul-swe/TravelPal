@@ -149,7 +149,17 @@ public class PlanningTripActivity extends AppCompatActivity {
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 
             GeminiClient geminiClient = new GeminiClient();
-            ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult("Give me just one trip name for a trip starting on " + trip.getStartDate() + " to " + trip.getLocation());
+
+            if (eventLocationEditText.getText().toString().isEmpty()) {
+                eventLocationEditText.setError("Please enter a location");
+                return;
+            }
+            if (eventStartTimeEditText.getText().toString().isEmpty()) {
+                eventStartTimeEditText.setError("Please enter a start time");
+                return;
+            }
+
+            ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult("Give me just one trip name for a trip starting on " + Objects.requireNonNull(eventStartTimeEditText.getText()) + " to " + eventLocationEditText.getText().toString());
 
             // Generate trip name using Gemini API
             Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
@@ -176,7 +186,7 @@ public class PlanningTripActivity extends AppCompatActivity {
                         // Get a reference to the user's data in the database
                         UserRepository userRepository = new UserRepository(uid);
                         DatabaseReference userRef = userRepository.getUserRef();
-                        DatabaseReference userItineraryRef = userRef.child("itinerary").push();
+                        DatabaseReference userItineraryRef = userRef.child("plannedTrips").push();
                         userItineraryRef.setValue(trip.getTripID());
                         Intent intent = new Intent(PlanningTripActivity.this, AddEventsActivity.class);
                         intent.putExtra("trip", trip);

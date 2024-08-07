@@ -44,7 +44,6 @@ public class SignUpActivity extends AppCompatActivity {
         User currentUser = new User();
         currentUser.setName(name);
         currentUser.setUserID(uid);
-        currentUser.setTrips(new ArrayList<>());
         currentUser.setProfileImage("user_profile.png");
 
         // Get a reference to the user's data in the database
@@ -90,7 +89,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                                     addUserToDatabase();
 
-                                    Intent intent = new Intent(SignUpActivity.this, RightNowActivity.class);
+                                    Intent intent = new Intent(SignUpActivity.this, InterestsActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {

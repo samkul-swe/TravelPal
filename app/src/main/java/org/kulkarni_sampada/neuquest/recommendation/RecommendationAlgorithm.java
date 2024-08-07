@@ -1,23 +1,12 @@
-package org.kulkarni_sampada.neuquest;
+package org.kulkarni_sampada.neuquest.recommendation;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -28,8 +17,6 @@ import org.kulkarni_sampada.neuquest.firebase.repository.database.UserRepository
 import org.kulkarni_sampada.neuquest.gemini.GeminiClient;
 import org.kulkarni_sampada.neuquest.model.Event;
 import org.kulkarni_sampada.neuquest.model.User;
-import org.kulkarni_sampada.neuquest.recommendation.RecommendationAlgorithm;
-import org.kulkarni_sampada.neuquest.recycler.EventAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,63 +25,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RightNowActivity extends AppCompatActivity {
-
-    private EventAdapter eventAdapter;
-    private RecyclerView recyclerView;
+public class RecommendationAlgorithm {
+    private String uid;
     private List<Event> allEvents;
 
-    private String uid;
-
-    private long backPressedTime = 0;
-    private static final long BACK_PRESS_INTERVAL = 2000; // 2 seconds
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_right_now);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
-
-        // Find the buttons
-        FloatingActionButton registerEventButton = findViewById(R.id.register_button);
-        FloatingActionButton userProfile = findViewById(R.id.user_profile_fab);
-        Button recommendationsButton = findViewById(R.id.recommendations_button);
-        SearchView searchView = findViewById(R.id.searchView);
-
-        // Set click listeners for the buttons
-        registerEventButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, RegisterEventActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        userProfile.setOnClickListener(v -> {
-            startActivity(new Intent(this, UserProfileActivity.class));
-            finish();
-        });
-
-        // Set up the search functionality
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterEvents(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterEvents(newText);
-                return true;
-            }
-        });
-
-        getEvents();
+    // Generate event recommendations based on user registration pattern
+    public RecommendationAlgorithm(String uid) {
+        this.uid = uid;
     }
 
+    // Get events from firebase
     public void getEvents() {
         allEvents = new ArrayList<>();
+        Log.e("RecommendationAlgorithm", "Getting events");
 
         EventRepository eventRepository = new EventRepository();
 
@@ -124,7 +67,7 @@ public class RightNowActivity extends AppCompatActivity {
     }
 
     // Get user registration pattern from firebase
-    private void getUserRegistrationPattern() {
+    public void getUserRegistrationPattern() {
 
         Log.e("RecommendationAlgorithm", "Getting user registration pattern");
 
@@ -156,7 +99,7 @@ public class RightNowActivity extends AppCompatActivity {
     }
 
     // Generate event recommendations based on user registration pattern
-    private void generateEventRecommendations(List<String> eventsAttendedIDs, List<String> userInterests) {
+    public void generateEventRecommendations(List<String> eventsAttendedIDs, List<String> userInterests) {
         Log.e("RecommendationAlgorithm", "Generating event recommendations");
         List<String> eventsAttended = new ArrayList<>();
         List<Event> recommendedEvents = new ArrayList<>();
@@ -184,25 +127,18 @@ public class RightNowActivity extends AppCompatActivity {
             public void onSuccess(GenerateContentResponse result) {
                 Log.e("RecommendationAlgorithm", "Success");
                 List<String> recommendedEventTitles = extractTitles(result.getText());
-                for (String title : recommendedEventTitles) {
-                    for (Event event : allEvents) {
-                        if (event.getTitle().equals(title)) {
-                            recommendedEvents.add(event);
-                        }
-                    }
-                }
-                runOnUiThread(() -> updateUI(recommendedEvents));
+
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(@NonNull Throwable t) {
                 // Handle the failure on the main thread
                 Log.e("RecommendationAlgorithm", "Error: " + t.getMessage());
             }
         }, executor);
     }
 
-    // Extract event titles from the Gemini response
+
     public static List<String> extractTitles(String input) {
         List<String> titles = new ArrayList<>();
         Pattern pattern = Pattern.compile("\\*\\*(.+?)\\:\\*\\*");
@@ -213,49 +149,4 @@ public class RightNowActivity extends AppCompatActivity {
         return titles;
     }
 
-    private void updateUI(List<Event> events) {
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        eventAdapter = new EventAdapter();
-        eventAdapter.updateData(events);
-        eventAdapter.setOnItemClickListener((event) -> {
-            Intent intent = new Intent(RightNowActivity.this, EventDetailsActivity.class);
-            intent.putExtra("event", event);
-            startActivity(intent);
-            finish();
-        });
-        recyclerView.setAdapter(eventAdapter);
-    }
-
-    public void onBackPressed() {
-        if (backPressedTime + BACK_PRESS_INTERVAL > System.currentTimeMillis()) {
-            super.onBackPressed();
-            return;
-        } else {
-            showExitConfirmationDialog();
-        }
-        backPressedTime = System.currentTimeMillis();
-    }
-
-    private void showExitConfirmationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Exit");
-        builder.setMessage("Are you sure you want to exit?");
-        builder.setPositiveButton("Yes", (dialog, which) -> finish());
-        builder.setNegativeButton("No", null);
-        builder.show();
-    }
-
-    private void filterEvents(String query) {
-        // Implement your logic to filter the event items based on the search query
-        List<Event> filteredEvents = new ArrayList<>();
-        for (Event event : allEvents) {
-            if (event.getTitle().toLowerCase().contains(query.toLowerCase()) ||
-                    event.getDescription().toLowerCase().contains(query.toLowerCase())) {
-                filteredEvents.add(event);
-            }
-        }
-        eventAdapter.updateData(filteredEvents);
-        recyclerView.setAdapter(eventAdapter);
-    }
 }
