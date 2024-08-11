@@ -58,7 +58,6 @@ public class RightNowActivity extends AppCompatActivity {
         // Find the buttons
         FloatingActionButton registerEventButton = findViewById(R.id.register_button);
         FloatingActionButton userProfile = findViewById(R.id.user_profile_fab);
-        Button recommendationsButton = findViewById(R.id.recommendations_button);
         SearchView searchView = findViewById(R.id.searchView);
 
         // Set click listeners for the buttons

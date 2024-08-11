@@ -77,21 +77,21 @@ public class UserProfileActivity extends AppCompatActivity {
         });
 
         launcher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK ) {
-                        // There are no request codes
-                        Intent data = result.getData();
-                        assert data != null;
-                        imageUri = data.getData();
-                        getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        Picasso.get().load(imageUri).into(userProfileImage);
-                        userProfileRepo.uploadProfileImage(imageUri, uid);
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK ) {
+                    // There are no request codes
+                    Intent data = result.getData();
+                    assert data != null;
+                    imageUri = data.getData();
+                    getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Picasso.get().load(imageUri).into(userProfileImage);
+                    userProfileRepo.uploadProfileImage(imageUri, uid);
 
-                        DatabaseReference userRef = userRepository.getUserRef();
-                        userRef.child("profileImage").setValue(uid);
-                    }
+                    DatabaseReference userRef = userRepository.getUserRef();
+                    userRef.child("profileImage").setValue(uid);
                 }
+            }
         );
     }
 

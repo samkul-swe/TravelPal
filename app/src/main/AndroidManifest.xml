@@ -33,9 +33,6 @@
             android:name=".PlanningTripActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterEventActivity"
-            android:exported="false" />
-        <activity
             android:name=".EventDetailsActivity"
             android:exported="false" />
         <activity
