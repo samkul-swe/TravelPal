@@ -57,4 +57,5 @@ dependencies {
     implementation(libs.generativeai)
     implementation(libs.material.v130alpha02)
     implementation(libs.guava)
+    implementation(libs.play.services.auth)
 }

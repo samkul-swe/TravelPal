@@ -14,15 +14,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Find the buttons in the layout
-        Button signUpButton = findViewById(R.id.signUpButton);
         Button loginButton = findViewById(R.id.loginButton);
-
-        // Set click listeners for the buttons
-        signUpButton.setOnClickListener(v -> {
-            // Start the sign-up activity
-            startActivity(new Intent(MainActivity.this, SignUpActivity.class));
-            finish();
-        });
 
         loginButton.setOnClickListener(v -> {
             // Start the login activity
