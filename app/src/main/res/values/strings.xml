@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">NEUQuest</string>
-    <string name="welcome_to_neuquest">Welcome to NEUQuest!</string>
+    <string name="app_name">TravelPal</string>
+    <string name="welcome_to_travelpal">Welcome to TravelPal!</string>
     <string name="sign_up">Sign Up</string>
     <string name="login">Login</string>
     <string name="enter_name">Name</string>

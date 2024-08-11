@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "org.kulkarni_sampada.neuquest"
+    namespace = "org.kulkarni_sampada.travelpal"
     compileSdk = 34
 
     buildFeatures {
@@ -13,7 +13,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.kulkarni_sampada.neuquest"
+        applicationId = "org.kulkarni_sampada.travelpal"
         minSdk = 27
         targetSdk = 34
         versionCode = 1

@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "NEUQuest"
+rootProject.name = "TravelPal"
 include(":app")
  
