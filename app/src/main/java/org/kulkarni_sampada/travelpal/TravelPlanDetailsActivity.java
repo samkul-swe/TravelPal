@@ -69,38 +69,36 @@ public class TravelPlanDetailsActivity extends AppCompatActivity {
                         places.add(place);
                     }
                 }
+                Task<DataSnapshot> meals_task = mealRepository.getMealRef().get();
+                meals_task.addOnSuccessListener(mealSnapshot -> {
+                    if (mealSnapshot.exists()) {
+                        for (String placeID : travelPlan.getPlaceIDs()) {
+                            if (placeID.contains("meal")) {
+                                Meal meal = new Meal();
+                                meal.setId(placeID);
+                                meal.setName(mealSnapshot.child(placeID).child("name").getValue(String.class));
+                                meal.setCuisine(mealSnapshot.child(placeID).child("cuisine").getValue(String.class));
+                                meal.setPrice(mealSnapshot.child(placeID).child("price").getValue(String.class));
+                                places.add(meal);
+                            }
+                        }
+
+                        TimelineAdapter timelineAdapter = new TimelineAdapter();
+
+                        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                        timelineAdapter.updateData(places);
+                        recyclerView.setAdapter(timelineAdapter);
+                    }
+                }).addOnFailureListener(e -> {
+                    // Handle any exceptions that occur during the database query
+                    Log.e("TravelPlanDetailsActivity", "Error retrieving meal data: " + e.getMessage());
+                });
             }
         }).addOnFailureListener(e -> {
             // Handle any exceptions that occur during the database query
             Log.e("TravelPlanDetailsActivity", "Error retrieving place data: " + e.getMessage());
         });
-
-
-        task = mealRepository.getMealRef().get();
-        task.addOnSuccessListener(dataSnapshot -> {
-            if (dataSnapshot.exists()) {
-                for (String placeID : travelPlan.getPlaceIDs()) {
-                    if (placeID.contains("meal")) {
-                        Meal meal = new Meal();
-                        meal.setId(placeID);
-                        meal.setName(dataSnapshot.child(placeID).child("name").getValue(String.class));
-                        meal.setCuisine(dataSnapshot.child(placeID).child("cuisine").getValue(String.class));
-                        meal.setPrice(dataSnapshot.child(placeID).child("price").getValue(String.class));
-                        places.add(meal);
-                    }
-                }
-            }
-        }).addOnFailureListener(e -> {
-            // Handle any exceptions that occur during the database query
-            Log.e("TravelPlanDetailsActivity", "Error retrieving meal data: " + e.getMessage());
-        });
-
-        TimelineAdapter timelineAdapter = new TimelineAdapter();
-
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        timelineAdapter.updateData(places);
-        recyclerView.setAdapter(timelineAdapter);
     }
 
     public void onBackPressed() {

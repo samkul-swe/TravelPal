@@ -188,10 +188,6 @@ public class TravelParametersActivity extends AppCompatActivity {
                         travelPlan.setPlanID(String.valueOf(System.currentTimeMillis()));
 
                         // Get a reference to the user's data in the database
-                        UserRepository userRepository = new UserRepository(uid);
-                        DatabaseReference userRef = userRepository.getUserRef();
-                        DatabaseReference userItineraryRef = userRef.child("plannedTrips").push();
-                        userItineraryRef.setValue(travelPlan.getPlanID());
                         Intent intent = new Intent(TravelParametersActivity.this, DesignTravelPlanActivity.class);
                         intent.putExtra("travelPlan", travelPlan);
                         startActivity(intent);
