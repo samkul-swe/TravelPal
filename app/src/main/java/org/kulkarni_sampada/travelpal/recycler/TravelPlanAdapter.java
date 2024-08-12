@@ -13,11 +13,11 @@ import org.kulkarni_sampada.travelpal.model.TravelPlan;
 
 import java.util.List;
 
-public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
+public class TravelPlanAdapter extends RecyclerView.Adapter<TravelPlanAdapter.ViewHolder> {
     private final List<TravelPlan> travelPlans;
-    private TripAdapter.OnItemClickListener listener;
+    private TravelPlanAdapter.OnItemClickListener listener;
 
-    public TripAdapter(List<TravelPlan> travelPlans) {
+    public TravelPlanAdapter(List<TravelPlan> travelPlans) {
         this.travelPlans = travelPlans;
     }
 
@@ -33,7 +33,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
         void onItemClick(TravelPlan travelPlan);
     }
 
-    public void setOnItemClickListener(TripAdapter.OnItemClickListener listener) {
+    public void setOnItemClickListener(TravelPlanAdapter.OnItemClickListener listener) {
         this.listener = listener;
     }
 

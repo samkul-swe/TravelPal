@@ -24,10 +24,9 @@ import com.squareup.picasso.Picasso;
 
 import org.kulkarni_sampada.travelpal.firebase.repository.database.TravelPlanRepository;
 import org.kulkarni_sampada.travelpal.firebase.repository.database.UserRepository;
-import org.kulkarni_sampada.travelpal.firebase.repository.storage.UserProfileRepository;
 import org.kulkarni_sampada.travelpal.model.TravelPlan;
 import org.kulkarni_sampada.travelpal.model.User;
-import org.kulkarni_sampada.travelpal.recycler.TripAdapter;
+import org.kulkarni_sampada.travelpal.recycler.TravelPlanAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,6 @@ public class UserProfileActivity extends AppCompatActivity {
     private String uid;
     private User user;
     private UserRepository userRepository;
-    private UserProfileRepository userProfileRepo;
     private TextView userNameTextView;
     private List<TravelPlan> travelPlans;
 
@@ -56,10 +54,6 @@ public class UserProfileActivity extends AppCompatActivity {
         // Get the current user's ID
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         uid = sharedPreferences.getString(AppConstants.UID_KEY, "");
-
-
-        userRepository = new UserRepository(uid);
-        userProfileRepo = new UserProfileRepository(uid);
 
         userNameTextView = findViewById(R.id.user_name);
         TextView changeProfileImageTextView = findViewById(R.id.change_profile_image);
@@ -86,21 +80,12 @@ public class UserProfileActivity extends AppCompatActivity {
                     imageUri = data.getData();
                     getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     Picasso.get().load(imageUri).into(userProfileImage);
-                    userProfileRepo.uploadProfileImage(imageUri, uid);
 
                     DatabaseReference userRef = userRepository.getUserRef();
                     userRef.child("profileImage").setValue(uid);
                 }
             }
         );
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(UserProfileActivity.this, RightNowActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     // Method to launch the image picker
@@ -125,7 +110,6 @@ public class UserProfileActivity extends AppCompatActivity {
         task.addOnSuccessListener(dataSnapshot -> {
             if (dataSnapshot.exists()) {
                 user.setName(dataSnapshot.child("name").getValue(String.class));
-                user.setProfileImage(dataSnapshot.child("profileImage").getValue(String.class));
                 List<String> tripIDs = new ArrayList<>();
                 for (DataSnapshot tripSnapshot : dataSnapshot.child("plannedTrips").getChildren()) {
                     String tripID = tripSnapshot.getValue(String.class);
@@ -145,9 +129,6 @@ public class UserProfileActivity extends AppCompatActivity {
         assert user != null;
         userNameTextView.setText(user.getName());
 
-        Uri profileImageUri = userProfileRepo.getProfileImage(user.getProfileImage());
-        Picasso.get().load(profileImageUri).into(userProfileImage);
-
         if (user.getTrips() != null) {
             getTrips();
         }
@@ -158,17 +139,16 @@ public class UserProfileActivity extends AppCompatActivity {
         TravelPlanRepository travelPlanRepository = new TravelPlanRepository();
         travelPlans = new ArrayList<>();
 
-        Task<DataSnapshot> task = travelPlanRepository.getTripRef().get();
+        Task<DataSnapshot> task = travelPlanRepository.getTravelPlanRef().get();
         // Handle any exceptions that occur during the database query
         task.addOnSuccessListener(dataSnapshot -> {
             if (dataSnapshot.exists()) {
 
                 for (String tripID : user.getTrips()) {
                     TravelPlan travelPlan = new TravelPlan();
-                    travelPlan.setTripID(tripID);
+                    travelPlan.setPlanID(tripID);
                     travelPlan.setTitle(dataSnapshot.child(tripID).child("title").getValue(String.class));
-                    travelPlan.setMinBudget(dataSnapshot.child(tripID).child("minBudget").getValue(String.class));
-                    travelPlan.setMaxBudget(dataSnapshot.child(tripID).child("maxBudget").getValue(String.class));
+                    travelPlan.setBudget(dataSnapshot.child(tripID).child("budget").getValue(String.class));
                     travelPlan.setMealsIncluded(dataSnapshot.child(tripID).child("mealsIncluded").getValue(String.class));
                     travelPlan.setTransportIncluded(dataSnapshot.child(tripID).child("transportIncluded").getValue(String.class));
                     travelPlan.setLocation(dataSnapshot.child(tripID).child("location").getValue(String.class));
@@ -176,19 +156,19 @@ public class UserProfileActivity extends AppCompatActivity {
                     travelPlan.setStartTime(dataSnapshot.child(tripID).child("startTime").getValue(String.class));
                     travelPlan.setEndDate(dataSnapshot.child(tripID).child("endDate").getValue(String.class));
                     travelPlan.setEndTime(dataSnapshot.child(tripID).child("endTime").getValue(String.class));
-                    List<String> eventIDs = new ArrayList<>();
+                    List<String> placeIDs = new ArrayList<>();
                     for (DataSnapshot eventSnapshot : dataSnapshot.child(tripID).child("eventIDs").getChildren()) {
-                        String eventID = eventSnapshot.getValue(String.class);
-                        eventIDs.add(eventID);
+                        String placeID = eventSnapshot.getValue(String.class);
+                        placeIDs.add(placeID);
                     }
-                    travelPlan.setEventIDs(eventIDs);
+                    travelPlan.setPlaceIDs(placeIDs);
                     travelPlans.add(travelPlan);
                     }
 
                 // Setup recycler view and show all travelPlans
                 RecyclerView tripRecyclerView = findViewById(R.id.trips_recycler_view);
                 tripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-                TripAdapter tripAdapter = new TripAdapter(travelPlans);
+                TravelPlanAdapter tripAdapter = new TravelPlanAdapter(travelPlans);
                 tripAdapter.setOnItemClickListener((trip) -> {
                     Intent intent = new Intent(UserProfileActivity.this, TravelPlanDetailsActivity.class);
                     intent.putExtra("trip", trip);

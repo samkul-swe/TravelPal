@@ -5,21 +5,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.vipulasri.timelineview.TimelineView;
+
 import org.kulkarni_sampada.travelpal.R;
-import org.kulkarni_sampada.travelpal.firebase.repository.storage.EventImageRepository;
+import org.kulkarni_sampada.travelpal.model.PlanItem;
 
 import java.util.List;
 
 public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder> {
-    private List<Event> events;
+    private List<PlanItem> planItems;
     private TimelineAdapter.OnItemClickListener listener;
 
     public TimelineAdapter() {}
 
-    public void updateData(List<Event> events) {
-        this.events = events;
+    public void updateData(List<PlanItem> planItems) {
+        this.planItems = planItems;
     }
 
     @Override
@@ -27,24 +30,19 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
         return TimelineView.getTimeLineViewType(position, getItemCount());
     }
 
+    @NonNull
     @Override
     public TimelineViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_timeline_event, parent, false);
+                .inflate(R.layout.item_timeline_item, parent, false);
         return new TimelineViewHolder(view, viewType);
     }
 
     @Override
     public void onBindViewHolder(TimelineViewHolder holder, int position) {
-        Event event = events.get(position);
+        PlanItem planItem = planItems.get(position);
 
-        if (!event.getStartDate().isEmpty()) {
-            holder.date.setVisibility(View.VISIBLE);
-            holder.date.setText(event.getStartDate() + event.getStartTime());
-        } else {
-            holder.date.setVisibility(View.GONE);
-        }
-
+        holder.date.setText(planItem.getDate());
         holder.message.setText(event.getTitle());
         holder.itemView.setOnClickListener(v -> handleEventClick(event));
     }
@@ -70,17 +68,17 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Event event);
+        void onItemClick(PlanItem planItem);
     }
 
     public void setOnItemClickListener(TimelineAdapter.OnItemClickListener listener) {
         this.listener = listener;
     }
 
-    private void handleEventClick(Event event) {
+    private void handlePlanItemClick(PlanItem planItem) {
         // Handle the event click event
         if (listener != null) {
-            listener.onItemClick(event);
+            listener.onItemClick(planItem);
         }
     }
 }

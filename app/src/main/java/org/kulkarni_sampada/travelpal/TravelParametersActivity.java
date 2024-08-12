@@ -156,7 +156,7 @@ public class TravelParametersActivity extends AppCompatActivity {
                 @SuppressLint("RestrictedApi")
                 @Override
                 public void onSuccess(GenerateContentResponse result) {
-                    Log.e("TripAdapter", "Success");
+                    Log.e("TravelPlanAdapter", "Success");
                     Pattern pattern = Pattern.compile("\\*\\*(.+?)\\*\\*");
                     Matcher matcher = pattern.matcher(result.getText());
                     if(matcher.find()) {
