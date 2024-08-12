@@ -23,11 +23,20 @@ public class DatabaseConnector {
         return database.getReference("Users").child(userId);
     }
 
-    public DatabaseReference getEventsReference() {
-        return database.getReference("Events");
+    public DatabaseReference getPlaceReference() {
+        return database.getReference("Places");
     }
 
-    public DatabaseReference getTripsReference() {
-        return database.getReference("Trips");
+    public DatabaseReference getTravelPlanReference() {
+        return database.getReference("TravelPlans");
     }
+
+    public DatabaseReference getMealReference() {
+        return database.getReference("Meals");
+    }
+
+    public DatabaseReference getTransportReference() {
+        return database.getReference("Transport");
+    }
+
 }

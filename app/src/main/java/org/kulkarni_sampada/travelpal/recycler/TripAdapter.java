@@ -9,16 +9,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.kulkarni_sampada.travelpal.R;
-import org.kulkarni_sampada.travelpal.model.Trip;
+import org.kulkarni_sampada.travelpal.model.TravelPlan;
 
 import java.util.List;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
-    private final List<Trip> trips;
+    private final List<TravelPlan> travelPlans;
     private TripAdapter.OnItemClickListener listener;
 
-    public TripAdapter(List<Trip> trips) {
-        this.trips = trips;
+    public TripAdapter(List<TravelPlan> travelPlans) {
+        this.travelPlans = travelPlans;
     }
 
     @NonNull
@@ -30,7 +30,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Trip trip);
+        void onItemClick(TravelPlan travelPlan);
     }
 
     public void setOnItemClickListener(TripAdapter.OnItemClickListener listener) {
@@ -39,24 +39,24 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Trip trip = trips.get(position);
+        TravelPlan travelPlan = travelPlans.get(position);
 
-        holder.tripNameTextView.setText(trip.getTitle());
-        holder.tripDateTextView.setText(trip.getStartDate());
-        holder.tripDestinationTextView.setText(trip.getLocation());
-        holder.itemView.setOnClickListener(v -> handleTripClick(trip));
+        holder.tripNameTextView.setText(travelPlan.getTitle());
+        holder.tripDateTextView.setText(travelPlan.getStartDate());
+        holder.tripDestinationTextView.setText(travelPlan.getLocation());
+        holder.itemView.setOnClickListener(v -> handleTripClick(travelPlan));
 
     }
 
     @Override
     public int getItemCount() {
-        return trips.size();
+        return travelPlans.size();
     }
 
-    private void handleTripClick(Trip trip) {
-        // Handle the trip click event
+    private void handleTripClick(TravelPlan travelPlan) {
+        // Handle the travelPlan click event
         if (listener != null) {
-            listener.onItemClick(trip);
+            listener.onItemClick(travelPlan);
         }
     }
 

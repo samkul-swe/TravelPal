@@ -96,7 +96,7 @@ public class InterestsActivity extends AppCompatActivity {
         // Navigate to the next screen or display a success message
         // This is just a sample implementation, you would replace this with your actual navigation logic
         Toast.makeText(this, "Interests saved!", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(InterestsActivity.this, RightNowActivity.class);
+        Intent intent = new Intent(InterestsActivity.this, TravelParametersActivity.class);
         startActivity(intent);
         finish();
     }

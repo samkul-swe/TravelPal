@@ -14,19 +14,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 
 import org.kulkarni_sampada.travelpal.firebase.repository.database.EventRepository;
-import org.kulkarni_sampada.travelpal.model.Event;
-import org.kulkarni_sampada.travelpal.model.Trip;
-import org.kulkarni_sampada.travelpal.recycler.TimelineEventAdapter;
+import org.kulkarni_sampada.travelpal.model.Place;
+import org.kulkarni_sampada.travelpal.model.TravelPlan;
+import org.kulkarni_sampada.travelpal.recycler.TimelineAdapter;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class TripDetailsActivity extends AppCompatActivity {
+public class TravelPlanDetailsActivity extends AppCompatActivity {
 
-    private List<Event> events;
-    private Trip trip;
+    private List<Place> places;
+    private TravelPlan travelPlan;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -34,9 +34,9 @@ public class TripDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
 
-        trip = (Trip) getIntent().getSerializableExtra("trip");
+        travelPlan = (TravelPlan) getIntent().getSerializableExtra("travelPlan");
 
-        // Fetch the events of the trip
+        // Fetch the places of the travelPlan
         getEvents();
 
         TextView tripNameTextView = findViewById(R.id.trip_name);
@@ -44,11 +44,11 @@ public class TripDetailsActivity extends AppCompatActivity {
         TextView tripPreferencesTextView = findViewById(R.id.trip_preferences);
         TextView tripTimeTextView = findViewById(R.id.trip_time);
 
-        tripNameTextView.setText(trip.getTitle());
-        tripTimeTextView.setText(getCurrentTimeString(Long.parseLong(trip.getTripID())));
-        tripBudgetTextView.setText("Budget from $" + trip.getMinBudget() + " - $" + trip.getMaxBudget());
-        boolean mealsIncluded = Boolean.parseBoolean(trip.getMealsIncluded());
-        boolean transportIncluded = Boolean.parseBoolean(trip.getTransportIncluded());
+        tripNameTextView.setText(travelPlan.getTitle());
+        tripTimeTextView.setText(getCurrentTimeString(Long.parseLong(travelPlan.getTripID())));
+        tripBudgetTextView.setText("Budget from $" + travelPlan.getMinBudget() + " - $" + travelPlan.getMaxBudget());
+        boolean mealsIncluded = Boolean.parseBoolean(travelPlan.getMealsIncluded());
+        boolean transportIncluded = Boolean.parseBoolean(travelPlan.getTransportIncluded());
 
         if (mealsIncluded && !transportIncluded) {
             tripPreferencesTextView.setText("Meal included in budget");
@@ -57,7 +57,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         } else if (mealsIncluded && transportIncluded) {
             tripPreferencesTextView.setText("Transportation and meals included in budget");
         } else if (!mealsIncluded && !transportIncluded) {
-            tripPreferencesTextView.setText("Budget only for the trip. No meals or transportation included");
+            tripPreferencesTextView.setText("Budget only for the travelPlan. No meals or transportation included");
         }
     }
 
@@ -70,32 +70,32 @@ public class TripDetailsActivity extends AppCompatActivity {
     public void getEvents() {
 
         EventRepository eventRepository = new EventRepository();
-        events = new ArrayList<>();
+        places = new ArrayList<>();
 
         Task<DataSnapshot> task = eventRepository.getEventRef().get();
         task.addOnSuccessListener(dataSnapshot -> {
             if (dataSnapshot.exists()) {
-                for(String eventID : trip.getEventIDs()) {
-                    Event event = new Event();
-                    event.setTitle(dataSnapshot.child(eventID).child("title").getValue(String.class));
-                    event.setImage(dataSnapshot.child(eventID).child("image").getValue(String.class));
-                    event.setDescription(dataSnapshot.child(eventID).child("description").getValue(String.class));
-                    event.setStartTime(dataSnapshot.child(eventID).child("startTime").getValue(String.class));
-                    event.setStartDate(dataSnapshot.child(eventID).child("startDate").getValue(String.class));
-                    event.setEndTime(dataSnapshot.child(eventID).child("endTime").getValue(String.class));
-                    event.setEndDate(dataSnapshot.child(eventID).child("endDate").getValue(String.class));
-                    event.setPrice(dataSnapshot.child(eventID).child("price").getValue(String.class));
-                    event.setLocation(dataSnapshot.child(eventID).child("location").getValue(String.class));
-                    event.setRegisterLink(dataSnapshot.child(eventID).child("registerLink").getValue(String.class));
-                    events.add(event);
+                for(String eventID : travelPlan.getEventIDs()) {
+                    Place place = new Place();
+                    place.setTitle(dataSnapshot.child(eventID).child("title").getValue(String.class));
+                    place.setImage(dataSnapshot.child(eventID).child("image").getValue(String.class));
+                    place.setDescription(dataSnapshot.child(eventID).child("description").getValue(String.class));
+                    place.setStartTime(dataSnapshot.child(eventID).child("startTime").getValue(String.class));
+                    place.setStartDate(dataSnapshot.child(eventID).child("startDate").getValue(String.class));
+                    place.setEndTime(dataSnapshot.child(eventID).child("endTime").getValue(String.class));
+                    place.setEndDate(dataSnapshot.child(eventID).child("endDate").getValue(String.class));
+                    place.setPrice(dataSnapshot.child(eventID).child("price").getValue(String.class));
+                    place.setLocation(dataSnapshot.child(eventID).child("location").getValue(String.class));
+                    place.setRegisterLink(dataSnapshot.child(eventID).child("registerLink").getValue(String.class));
+                    places.add(place);
                 }
-                TimelineEventAdapter eventAdapter = new TimelineEventAdapter();
+                TimelineAdapter eventAdapter = new TimelineAdapter();
 
                 RecyclerView recyclerView = findViewById(R.id.recycler_view);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                eventAdapter.updateData(events);
+                eventAdapter.updateData(places);
                 eventAdapter.setOnItemClickListener((event) -> {
-                    Intent intent = new Intent(TripDetailsActivity.this, EventDetailsActivity.class);
+                    Intent intent = new Intent(TravelPlanDetailsActivity.this, EventDetailsActivity.class);
                     intent.putExtra("event", event);
                     startActivity(intent);
                     finish();
@@ -110,7 +110,7 @@ public class TripDetailsActivity extends AppCompatActivity {
 
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent = new Intent(TripDetailsActivity.this, UserProfileActivity.class);
+        Intent intent = new Intent(TravelPlanDetailsActivity.this, UserProfileActivity.class);
         startActivity(intent);
         finish();
     }

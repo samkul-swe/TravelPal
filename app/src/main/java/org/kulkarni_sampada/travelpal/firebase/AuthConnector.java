@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class AuthConnector {
     private static FirebaseAuth mAuth;
+    private static FirebaseUser user;
 
     public static void signInOrCreateUser(String email, String password, OnAuthResultListener listener) {
         mAuth = FirebaseAuth.getInstance();
@@ -13,7 +14,7 @@ public class AuthConnector {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         // User is signed in
-                        FirebaseUser user = mAuth.getCurrentUser();
+                        user = mAuth.getCurrentUser();
                         listener.onAuthSuccess(user);
                     } else {
                         // Sign in failed, create user

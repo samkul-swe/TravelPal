@@ -6,11 +6,26 @@ public class User {
     private String userID;
     private String name;
     private List<String> plannedTrips; // list of trip IDs
-    private String profileImage;
-    private List<String> eventsAttended; // list of event IDs
+    private List<String> placesVisited; // list of places IDs
     private List<String> interests; // list of interests
 
     public User(){}
+
+    public List<String> getPlannedTrips() {
+        return plannedTrips;
+    }
+
+    public void setPlannedTrips(List<String> plannedTrips) {
+        this.plannedTrips = plannedTrips;
+    }
+
+    public List<String> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
+    }
 
     public String getUserID() {
         return userID;
@@ -36,23 +51,15 @@ public class User {
         this.plannedTrips = plannedTrips;
     }
 
-    public String getProfileImage() {
-        return profileImage;
+    public List<String> getPlacesVisited() {
+        return placesVisited;
     }
 
-    public void setProfileImage(String profileImage) {
-        this.profileImage = profileImage;
-    }
-
-    public List<String> getEventsAttended() {
-        return eventsAttended;
-    }
-
-    public void setEventsAttended(List<String> eventsAttended) {
-        this.eventsAttended = eventsAttended;
+    public void setPlacesVisited(List<String> placesVisited) {
+        this.placesVisited = placesVisited;
     }
 
     public String toString() {
-        return userID + " " + name + " " + plannedTrips + " " + profileImage + " " + eventsAttended + " " + interests;
+        return userID + " " + name + " " + plannedTrips + " " + placesVisited + " " + interests;
     }
 }

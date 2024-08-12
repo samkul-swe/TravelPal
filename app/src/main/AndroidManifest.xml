@@ -5,7 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <application
         android:allowBackup="true"
@@ -21,22 +22,16 @@
             android:name=".InterestsActivity"
             android:exported="false" />
         <activity
-            android:name=".AddEventsActivity"
+            android:name=".DesignTravelPlanActivity"
             android:exported="false" />
         <activity
-            android:name=".TripDetailsActivity"
+            android:name=".TravelPlanDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".UserProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".PlanningTripActivity"
-            android:exported="false" />
-        <activity
-            android:name=".EventDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RightNowActivity"
+            android:name=".TravelParametersActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
@@ -46,7 +41,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

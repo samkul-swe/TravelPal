@@ -11,13 +11,13 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.RadioButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ai.client.generativeai.type.GenerateContentResponse;
-import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -26,7 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.kulkarni_sampada.travelpal.firebase.repository.database.UserRepository;
 import org.kulkarni_sampada.travelpal.gemini.GeminiClient;
-import org.kulkarni_sampada.travelpal.model.Trip;
+import org.kulkarni_sampada.travelpal.model.TravelPlan;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -36,22 +36,23 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PlanningTripActivity extends AppCompatActivity {
-    private RangeSlider budgetRangeSlider;
-    private TextView minBudgetTextView, maxBudgetTextView;
+public class TravelParametersActivity extends AppCompatActivity {
+    private RadioButton totalBudgetRadioButton, perPersonBudgetRadioButton;
+    private TextInputEditText budgetEditText;
     private EditText eventLocationEditText;
     private TextInputEditText eventStartTimeEditText, eventEndTimeEditText, eventStartDateEditText, eventEndDateEditText;
     private CheckBox mealsCheckbox, transportCheckbox;
     private Button submitButton;
 
     private String uid;
+    private long backPressedTime;
+    private Toast backToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_planning_trip);
+        setContentView(R.layout.activity_travel_parameters);
         bindViews();
-        setupBudgetSlider();
         setupSubmitButton();
         setupDateTimePicker();
 
@@ -60,9 +61,9 @@ public class PlanningTripActivity extends AppCompatActivity {
     }
 
     private void bindViews() {
-        budgetRangeSlider = findViewById(R.id.budget_range_slider);
-        minBudgetTextView = findViewById(R.id.min_budget_text_view);
-        maxBudgetTextView = findViewById(R.id.max_budget_text_view);
+        totalBudgetRadioButton = findViewById(R.id.total_budget_radio_button);
+        perPersonBudgetRadioButton = findViewById(R.id.per_person_budget_radio_button);
+        budgetEditText = findViewById(R.id.budget_amount_edittext);
         mealsCheckbox = findViewById(R.id.meals_checkbox);
         transportCheckbox = findViewById(R.id.transport_checkbox);
         submitButton = findViewById(R.id.submit_button);
@@ -128,21 +129,10 @@ public class PlanningTripActivity extends AppCompatActivity {
         timePickerDialog.show();
     }
 
-    @SuppressLint("SetTextI18n")
-    private void setupBudgetSlider() {
-        budgetRangeSlider.setValueFrom(0f);
-        budgetRangeSlider.setValueTo(5000f);
-        budgetRangeSlider.setStepSize(50f);
-        budgetRangeSlider.addOnChangeListener((slider, value, fromUser) -> {
-            minBudgetTextView.setText("$" + slider.getValues().get(0));
-            maxBudgetTextView.setText("$" + slider.getValues().get(1));
-        });
-    }
-
     private void setupSubmitButton() {
         submitButton.setOnClickListener(v -> {
             // Handle submit button click
-            Trip trip = new Trip();
+            TravelPlan travelPlan = new TravelPlan();
 
             // Create a ThreadPoolExecutor
             int numThreads = Runtime.getRuntime().availableProcessors();
@@ -154,14 +144,14 @@ public class PlanningTripActivity extends AppCompatActivity {
                 eventLocationEditText.setError("Please enter a location");
                 return;
             }
-            if (eventStartTimeEditText.getText().toString().isEmpty()) {
+            if (Objects.requireNonNull(eventStartTimeEditText.getText()).toString().isEmpty()) {
                 eventStartTimeEditText.setError("Please enter a start time");
                 return;
             }
 
-            ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult("Give me just one trip name for a trip starting on " + Objects.requireNonNull(eventStartTimeEditText.getText()) + " to " + eventLocationEditText.getText().toString());
+            ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult("Give me just one travelPlan name for a travelPlan starting on " + Objects.requireNonNull(eventStartTimeEditText.getText()) + " to " + eventLocationEditText.getText().toString());
 
-            // Generate trip name using Gemini API
+            // Generate travelPlan name using Gemini API
             Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
                 @SuppressLint("RestrictedApi")
                 @Override
@@ -170,26 +160,27 @@ public class PlanningTripActivity extends AppCompatActivity {
                     Pattern pattern = Pattern.compile("\\*\\*(.+?)\\*\\*");
                     Matcher matcher = pattern.matcher(result.getText());
                     if(matcher.find()) {
-                        trip.setTitle(matcher.group(1));
+                        travelPlan.setTitle(matcher.group(1));
 
-                        trip.setMinBudget(String.valueOf(budgetRangeSlider.getValues().get(0)));
-                        trip.setMaxBudget(String.valueOf(budgetRangeSlider.getValues().get(1)));
-                        trip.setMealsIncluded(String.valueOf(mealsCheckbox.isChecked()));
-                        trip.setTransportIncluded(String.valueOf(transportCheckbox.isChecked()));
-                        trip.setLocation(eventLocationEditText.getText().toString());
-                        trip.setStartDate(Objects.requireNonNull(eventStartTimeEditText.getText()).toString());
-                        trip.setEndTime(Objects.requireNonNull(eventEndTimeEditText.getText()).toString());
-                        trip.setStartDate(Objects.requireNonNull(eventStartDateEditText.getText()).toString());
-                        trip.setEndDate(Objects.requireNonNull(eventEndDateEditText.getText()).toString());
-                        trip.setTripID(String.valueOf(System.currentTimeMillis()));
+                        travelPlan.setBudget(Objects.requireNonNull(budgetEditText.getText()).toString());
+                        travelPlan.setIsPerPersonBudget(String.valueOf(perPersonBudgetRadioButton.isChecked()));
+                        travelPlan.setIsTotalBudget(String.valueOf(totalBudgetRadioButton.isChecked()));
+                        travelPlan.setMealsIncluded(String.valueOf(mealsCheckbox.isChecked()));
+                        travelPlan.setTransportIncluded(String.valueOf(transportCheckbox.isChecked()));
+                        travelPlan.setLocation(eventLocationEditText.getText().toString());
+                        travelPlan.setStartDate(Objects.requireNonNull(eventStartTimeEditText.getText()).toString());
+                        travelPlan.setEndTime(Objects.requireNonNull(eventEndTimeEditText.getText()).toString());
+                        travelPlan.setStartDate(Objects.requireNonNull(eventStartDateEditText.getText()).toString());
+                        travelPlan.setEndDate(Objects.requireNonNull(eventEndDateEditText.getText()).toString());
+                        travelPlan.setPlanID(String.valueOf(System.currentTimeMillis()));
 
                         // Get a reference to the user's data in the database
                         UserRepository userRepository = new UserRepository(uid);
                         DatabaseReference userRef = userRepository.getUserRef();
                         DatabaseReference userItineraryRef = userRef.child("plannedTrips").push();
-                        userItineraryRef.setValue(trip.getTripID());
-                        Intent intent = new Intent(PlanningTripActivity.this, AddEventsActivity.class);
-                        intent.putExtra("trip", trip);
+                        userItineraryRef.setValue(travelPlan.getPlanID());
+                        Intent intent = new Intent(TravelParametersActivity.this, DesignTravelPlanActivity.class);
+                        intent.putExtra("travelPlan", travelPlan);
                         startActivity(intent);
                         finish();
                     }
@@ -198,17 +189,22 @@ public class PlanningTripActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     // Handle the failure on the main thread
-                    Log.e("TripAdapter", "Error: " + t.getMessage());
+                    Log.e("TravelPlanAdapter", "Error: " + t.getMessage());
                 }
             }, executor);
         });
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(PlanningTripActivity.this, UserProfileActivity.class);
-        startActivity(intent);
-        finish();
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            if (backToast != null) backToast.cancel();
+            moveTaskToBack(true);
+        } else {
+            backToast = Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT);
+            backToast.show();
+        }
+        backPressedTime = System.currentTimeMillis();
     }
 }

@@ -22,10 +22,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Picasso;
 
-import org.kulkarni_sampada.travelpal.firebase.repository.database.TripRepository;
+import org.kulkarni_sampada.travelpal.firebase.repository.database.TravelPlanRepository;
 import org.kulkarni_sampada.travelpal.firebase.repository.database.UserRepository;
 import org.kulkarni_sampada.travelpal.firebase.repository.storage.UserProfileRepository;
-import org.kulkarni_sampada.travelpal.model.Trip;
+import org.kulkarni_sampada.travelpal.model.TravelPlan;
 import org.kulkarni_sampada.travelpal.model.User;
 import org.kulkarni_sampada.travelpal.recycler.TripAdapter;
 
@@ -42,7 +42,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private UserRepository userRepository;
     private UserProfileRepository userProfileRepo;
     private TextView userNameTextView;
-    private List<Trip> trips;
+    private List<TravelPlan> travelPlans;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         TextView plannedTripsTextView = findViewById(R.id.planned_trips_title);
         plannedTripsTextView.setOnClickListener(v -> {
-            Intent intent = new Intent(UserProfileActivity.this, PlanningTripActivity.class);
+            Intent intent = new Intent(UserProfileActivity.this, TravelParametersActivity.class);
             startActivity(intent);
             finish();
         });
@@ -155,42 +155,42 @@ public class UserProfileActivity extends AppCompatActivity {
 
     public void getTrips() {
 
-        TripRepository tripRepository = new TripRepository();
-        trips = new ArrayList<>();
+        TravelPlanRepository travelPlanRepository = new TravelPlanRepository();
+        travelPlans = new ArrayList<>();
 
-        Task<DataSnapshot> task = tripRepository.getTripRef().get();
+        Task<DataSnapshot> task = travelPlanRepository.getTripRef().get();
         // Handle any exceptions that occur during the database query
         task.addOnSuccessListener(dataSnapshot -> {
             if (dataSnapshot.exists()) {
 
                 for (String tripID : user.getTrips()) {
-                    Trip trip = new Trip();
-                    trip.setTripID(tripID);
-                    trip.setTitle(dataSnapshot.child(tripID).child("title").getValue(String.class));
-                    trip.setMinBudget(dataSnapshot.child(tripID).child("minBudget").getValue(String.class));
-                    trip.setMaxBudget(dataSnapshot.child(tripID).child("maxBudget").getValue(String.class));
-                    trip.setMealsIncluded(dataSnapshot.child(tripID).child("mealsIncluded").getValue(String.class));
-                    trip.setTransportIncluded(dataSnapshot.child(tripID).child("transportIncluded").getValue(String.class));
-                    trip.setLocation(dataSnapshot.child(tripID).child("location").getValue(String.class));
-                    trip.setStartDate(dataSnapshot.child(tripID).child("startDate").getValue(String.class));
-                    trip.setStartTime(dataSnapshot.child(tripID).child("startTime").getValue(String.class));
-                    trip.setEndDate(dataSnapshot.child(tripID).child("endDate").getValue(String.class));
-                    trip.setEndTime(dataSnapshot.child(tripID).child("endTime").getValue(String.class));
+                    TravelPlan travelPlan = new TravelPlan();
+                    travelPlan.setTripID(tripID);
+                    travelPlan.setTitle(dataSnapshot.child(tripID).child("title").getValue(String.class));
+                    travelPlan.setMinBudget(dataSnapshot.child(tripID).child("minBudget").getValue(String.class));
+                    travelPlan.setMaxBudget(dataSnapshot.child(tripID).child("maxBudget").getValue(String.class));
+                    travelPlan.setMealsIncluded(dataSnapshot.child(tripID).child("mealsIncluded").getValue(String.class));
+                    travelPlan.setTransportIncluded(dataSnapshot.child(tripID).child("transportIncluded").getValue(String.class));
+                    travelPlan.setLocation(dataSnapshot.child(tripID).child("location").getValue(String.class));
+                    travelPlan.setStartDate(dataSnapshot.child(tripID).child("startDate").getValue(String.class));
+                    travelPlan.setStartTime(dataSnapshot.child(tripID).child("startTime").getValue(String.class));
+                    travelPlan.setEndDate(dataSnapshot.child(tripID).child("endDate").getValue(String.class));
+                    travelPlan.setEndTime(dataSnapshot.child(tripID).child("endTime").getValue(String.class));
                     List<String> eventIDs = new ArrayList<>();
                     for (DataSnapshot eventSnapshot : dataSnapshot.child(tripID).child("eventIDs").getChildren()) {
                         String eventID = eventSnapshot.getValue(String.class);
                         eventIDs.add(eventID);
                     }
-                    trip.setEventIDs(eventIDs);
-                    trips.add(trip);
+                    travelPlan.setEventIDs(eventIDs);
+                    travelPlans.add(travelPlan);
                     }
 
-                // Setup recycler view and show all trips
+                // Setup recycler view and show all travelPlans
                 RecyclerView tripRecyclerView = findViewById(R.id.trips_recycler_view);
                 tripRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-                TripAdapter tripAdapter = new TripAdapter(trips);
+                TripAdapter tripAdapter = new TripAdapter(travelPlans);
                 tripAdapter.setOnItemClickListener((trip) -> {
-                    Intent intent = new Intent(UserProfileActivity.this, TripDetailsActivity.class);
+                    Intent intent = new Intent(UserProfileActivity.this, TravelPlanDetailsActivity.class);
                     intent.putExtra("trip", trip);
                     startActivity(intent);
                     finish();

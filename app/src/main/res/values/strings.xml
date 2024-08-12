@@ -44,7 +44,7 @@
     <string name="submit">Submit</string>
     <string name="minimumBudget">$0</string>
     <string name="maximumBudget">$5000</string>
-    <string name="plan_a_trip">Plan a trip</string>
+    <string name="plan_a_trip">Plan a travel</string>
     <string name="planned_trips">Planned Trips</string>
     <string name="destination">Destination</string>
     <string name="duration">Duration</string>
@@ -54,4 +54,7 @@
     <string name="show_location">Show Location</string>
     <string name="confirm_selection">Confirm Selection</string>
     <string name="user_profile">User Profile</string>
+    <string name="total_budget">Total Budget</string>
+    <string name="per_person_budget">Per person budget</string>
+    <string name="budget_amount">Amount</string>
 </resources>
