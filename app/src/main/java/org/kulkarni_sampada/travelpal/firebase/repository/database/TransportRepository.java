@@ -7,8 +7,8 @@ import org.kulkarni_sampada.travelpal.firebase.DatabaseConnector;
 public class TransportRepository {
     private final DatabaseReference transportRef;
 
-    public TransportRepository(String transportId) {
-        transportRef = DatabaseConnector.getInstance().getUsersReference(transportId);
+    public TransportRepository() {
+        transportRef = DatabaseConnector.getInstance().getTransportReference();
     }
 
     public DatabaseReference getTransportRef() {

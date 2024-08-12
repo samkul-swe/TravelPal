@@ -9,7 +9,7 @@ public class Transport implements Serializable {
     private String time;
     private String cost;
 
-    Transport() {}
+    public Transport() {}
 
     public String getId() {
         return id;

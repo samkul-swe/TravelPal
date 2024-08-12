@@ -6,7 +6,7 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/trip_name"
+        android:id="@+id/travel_plan_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceHeadline6"
@@ -18,14 +18,14 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/trip_date"
+            android:id="@+id/travel_plan_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textAppearance="?attr/textAppearanceBody2" />
 
         <TextView
-            android:id="@+id/trip_destination"
+            android:id="@+id/travel_plan_destination"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

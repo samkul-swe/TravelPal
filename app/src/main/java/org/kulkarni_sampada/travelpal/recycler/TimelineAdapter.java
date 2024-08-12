@@ -48,19 +48,18 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
 
         if (planItem instanceof Place) {
             Place place = (Place) planItem;
-            holder.timeline.setMarker(R.drawable.ic_place);
             holder.date.setText(place.getDate());
             holder.message.setText(place.getName());
 
         } else if (planItem instanceof Meal) {
             Meal meal = (Meal) planItem;
-            holder.timeline.setMarker(R.drawable.ic_meal);
             holder.message.setText(meal.getName());
+            holder.date.setVisibility(View.GONE);
 
         } else if (planItem instanceof Transport) {
             Transport transport = (Transport) planItem;
-            holder.timeline.setMarker(R.drawable.ic_transport);
             holder.message.setText(transport.getType() + " " + transport.getMode());
+            holder.date.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(v -> handlePlanItemClick(planItem));

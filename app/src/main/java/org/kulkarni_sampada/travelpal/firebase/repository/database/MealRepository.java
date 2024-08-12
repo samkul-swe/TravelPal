@@ -7,8 +7,8 @@ import org.kulkarni_sampada.travelpal.firebase.DatabaseConnector;
 public class MealRepository {
     private final DatabaseReference mealRef;
 
-    public MealRepository(String mealId) {
-        mealRef = DatabaseConnector.getInstance().getUsersReference(mealId);
+    public MealRepository() {
+        mealRef = DatabaseConnector.getInstance().getMealReference();
     }
 
     public DatabaseReference getMealRef() {

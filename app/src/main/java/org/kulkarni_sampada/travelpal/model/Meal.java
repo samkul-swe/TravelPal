@@ -8,7 +8,7 @@ public class Meal implements Serializable {
     private String price;
     private String cuisine;
 
-    Meal() {}
+    public Meal() {}
 
     public String getId() {
         return id;

@@ -43,8 +43,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class DesignTravelPlanActivity extends AppCompatActivity {
-    private List<PlanItem> planItems;
-    private List<PlanItem> selections;
+    private List<Object> planItems;
+    private List<Object> selections;
     private PlanItemAdapter planItemAdapter;
     private final List<String> selectedIDs = new ArrayList<>();
     private TravelPlan travelPlan;
@@ -81,22 +81,16 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
         if (bottomNavigationView == null) {
             Log.e("RightNowActivity", "bottomNavigationView is null");
         } else {
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int itemId = item.getItemId();
-                    if (itemId == R.id.navigation_home) {
-                        startActivity(new Intent(AdminConsole.this, RightNowActivity.class));
-                        return true;
-                    } else if (itemId == R.id.navigation_budget) {
-                        startActivity(new Intent(AdminConsole.this, PlanningTripActivity.class));
-                        return true;
-                    } else if (itemId == R.id.navigation_profile) {
-                        startActivity(new Intent(AdminConsole.this, ProfileActivity.class));
-                        return true;
-                    }
-                    return false;
+            bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.navigation_budget) {
+                    startActivity(new Intent(DesignTravelPlanActivity.this, TravelParametersActivity.class));
+                    return true;
+                } else if (itemId == R.id.navigation_profile) {
+                    startActivity(new Intent(DesignTravelPlanActivity.this, UserProfileActivity.class));
+                    return true;
                 }
+                return false;
             });
         }
 
@@ -107,22 +101,23 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
         if (selections.isEmpty()) {
                 Toast.makeText(this, "Please select at least one item", Toast.LENGTH_SHORT).show();
         } else {
-            for (PlanItem planItem : selections) {
-                selectedIDs.add(planItem.getId());
+            for (Object planItem : selections) {
                 if (planItem instanceof Place) {
                     Place place = (Place) planItem;
+                    selectedIDs.add(place.getId());
                     DatabaseReference placeRef = DatabaseConnector.getInstance().getPlaceReference().child(place.getId());
                     placeRef.setValue(place);
                 } else if (planItem instanceof Meal) {
                     Meal meal = (Meal) planItem;
+                    selectedIDs.add(meal.getId());
                     DatabaseReference mealRef = DatabaseConnector.getInstance().getMealReference().child(meal.getId());
                     mealRef.setValue(meal);
                 } else if (planItem instanceof Transport) {
                     Transport transport = (Transport) planItem;
+                    selectedIDs.add(transport.getId());
                     DatabaseReference transportRef = DatabaseConnector.getInstance().getTransportReference().child(transport.getId());
                     transportRef.setValue(transport);
                 }
-
             }
             travelPlan.setPlaceIDs(selectedIDs);
 
@@ -151,8 +146,8 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
 
     private void filterPlanItems(String query) {
         // Implement your logic to filter the event items based on the search query
-        List<PlanItem> filteredPlanItems = new ArrayList<>();
-        for (PlanItem planItem : planItems) {
+        List<Object> filteredPlanItems = new ArrayList<>();
+        for (Object planItem : planItems) {
             if (planItem instanceof Place) {
                 Place place = (Place) planItem;
                 if (place.getName().toLowerCase().contains(query.toLowerCase()) ||
@@ -262,7 +257,7 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
     }
 
 
-    private void updateUI(List<PlanItem> planItems) {
+    private void updateUI(List<Object> planItems) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         planItemAdapter = new PlanItemAdapter();

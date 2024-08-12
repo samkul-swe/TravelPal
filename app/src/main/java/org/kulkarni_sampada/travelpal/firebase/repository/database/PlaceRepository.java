@@ -7,8 +7,8 @@ import org.kulkarni_sampada.travelpal.firebase.DatabaseConnector;
 public class PlaceRepository {
     private final DatabaseReference placeRef;
 
-    public PlaceRepository(String placeId) {
-        placeRef = DatabaseConnector.getInstance().getUsersReference(placeId);
+    public PlaceRepository() {
+        placeRef = DatabaseConnector.getInstance().getPlaceReference();
     }
 
     public DatabaseReference getPlaceRef() {

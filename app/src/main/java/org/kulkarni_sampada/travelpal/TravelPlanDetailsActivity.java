@@ -4,10 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,19 +14,21 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 
-import org.kulkarni_sampada.travelpal.firebase.repository.database.EventRepository;
+import org.kulkarni_sampada.travelpal.firebase.repository.database.MealRepository;
+import org.kulkarni_sampada.travelpal.firebase.repository.database.PlaceRepository;
+import org.kulkarni_sampada.travelpal.firebase.repository.database.TransportRepository;
+import org.kulkarni_sampada.travelpal.model.Meal;
 import org.kulkarni_sampada.travelpal.model.Place;
+import org.kulkarni_sampada.travelpal.model.Transport;
 import org.kulkarni_sampada.travelpal.model.TravelPlan;
 import org.kulkarni_sampada.travelpal.recycler.TimelineAdapter;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class TravelPlanDetailsActivity extends AppCompatActivity {
 
-    private List<Place> places;
+    private List<Object> places;
     private TravelPlan travelPlan;
 
     @SuppressLint("SetTextI18n")
@@ -54,65 +54,94 @@ public class TravelPlanDetailsActivity extends AppCompatActivity {
         if (bottomNavigationView == null) {
             Log.e("RightNowActivity", "bottomNavigationView is null");
         } else {
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int itemId = item.getItemId();
-                    if (itemId == R.id.navigation_home) {
-                        startActivity(new Intent(AdminConsole.this, RightNowActivity.class));
-                        return true;
-                    } else if (itemId == R.id.navigation_budget) {
-                        startActivity(new Intent(AdminConsole.this, PlanningTripActivity.class));
-                        return true;
-                    } else if (itemId == R.id.navigation_profile) {
-                        startActivity(new Intent(AdminConsole.this, ProfileActivity.class));
-                        return true;
-                    }
-                    return false;
+            bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.navigation_budget) {
+                    startActivity(new Intent(TravelPlanDetailsActivity.this, UserProfileActivity.class));
+                    return true;
+                } else if (itemId == R.id.navigation_profile) {
+                    startActivity(new Intent(TravelPlanDetailsActivity.this, UserProfileActivity.class));
+                    return true;
                 }
+                return false;
             });
         }
     }
 
     public void getPlanItems() {
 
-        Place eventRepository = new EventRepository();
+        PlaceRepository placeRepository = new PlaceRepository();
+        MealRepository mealRepository = new MealRepository();
+        TransportRepository transportRepository = new TransportRepository();
         places = new ArrayList<>();
 
-        Task<DataSnapshot> task = eventRepository.getEventRef().get();
+        Task<DataSnapshot> task = placeRepository.getPlaceRef().get();
         task.addOnSuccessListener(dataSnapshot -> {
             if (dataSnapshot.exists()) {
-                for(String eventID : travelPlan.getEventIDs()) {
-                    Place place = new Place();
-                    place.setTitle(dataSnapshot.child(eventID).child("title").getValue(String.class));
-                    place.setImage(dataSnapshot.child(eventID).child("image").getValue(String.class));
-                    place.setDescription(dataSnapshot.child(eventID).child("description").getValue(String.class));
-                    place.setStartTime(dataSnapshot.child(eventID).child("startTime").getValue(String.class));
-                    place.setStartDate(dataSnapshot.child(eventID).child("startDate").getValue(String.class));
-                    place.setEndTime(dataSnapshot.child(eventID).child("endTime").getValue(String.class));
-                    place.setEndDate(dataSnapshot.child(eventID).child("endDate").getValue(String.class));
-                    place.setPrice(dataSnapshot.child(eventID).child("price").getValue(String.class));
-                    place.setLocation(dataSnapshot.child(eventID).child("location").getValue(String.class));
-                    place.setRegisterLink(dataSnapshot.child(eventID).child("registerLink").getValue(String.class));
-                    places.add(place);
+                for (String placeID : travelPlan.getPlaceIDs()) {
+                    if (placeID.contains("place")) {
+                        Place place = new Place();
+                        place.setId(placeID);
+                        place.setName(dataSnapshot.child(placeID).child("name").getValue(String.class));
+                        place.setDescription(dataSnapshot.child(placeID).child("description").getValue(String.class));
+                        place.setPrice(dataSnapshot.child(placeID).child("price").getValue(String.class));
+                        place.setDate(dataSnapshot.child(placeID).child("date").getValue(String.class));
+                        place.setTime(dataSnapshot.child(placeID).child("time").getValue(String.class));
+                        places.add(place);
+                    }
                 }
-                TimelineAdapter eventAdapter = new TimelineAdapter();
-
-                RecyclerView recyclerView = findViewById(R.id.recycler_view);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                eventAdapter.updateData(places);
-                eventAdapter.setOnItemClickListener((event) -> {
-                    Intent intent = new Intent(TravelPlanDetailsActivity.this, EventDetailsActivity.class);
-                    intent.putExtra("event", event);
-                    startActivity(intent);
-                    finish();
-                });
-                recyclerView.setAdapter(eventAdapter);
             }
         }).addOnFailureListener(e -> {
             // Handle any exceptions that occur during the database query
-            Log.e("EventRepository", "Error retrieving event data: " + e.getMessage());
+            Log.e("TravelPlanDetailsActivity", "Error retrieving place data: " + e.getMessage());
         });
+
+
+        task = mealRepository.getMealRef().get();
+        task.addOnSuccessListener(dataSnapshot -> {
+            if (dataSnapshot.exists()) {
+                for (String placeID : travelPlan.getPlaceIDs()) {
+                    if (placeID.contains("meal")) {
+                        Meal meal = new Meal();
+                        meal.setId(placeID);
+                        meal.setName(dataSnapshot.child(placeID).child("name").getValue(String.class));
+                        meal.setCuisine(dataSnapshot.child(placeID).child("cuisine").getValue(String.class));
+                        meal.setPrice(dataSnapshot.child(placeID).child("price").getValue(String.class));
+                        places.add(meal);
+                    }
+                }
+            }
+        }).addOnFailureListener(e -> {
+            // Handle any exceptions that occur during the database query
+            Log.e("TravelPlanDetailsActivity", "Error retrieving meal data: " + e.getMessage());
+        });
+
+        task = transportRepository.getTransportRef().get();
+        task.addOnSuccessListener(dataSnapshot -> {
+            if (dataSnapshot.exists()) {
+                for (String placeID : travelPlan.getPlaceIDs()) {
+                    if (placeID.contains("transport")) {
+                        Transport transport = new Transport();
+                        transport.setId(placeID);
+                        transport.setTime(dataSnapshot.child(placeID).child("time").getValue(String.class));
+                        transport.setMode(dataSnapshot.child(placeID).child("mode").getValue(String.class));
+                        transport.setCost(dataSnapshot.child(placeID).child("cost").getValue(String.class));
+                        transport.setType(dataSnapshot.child(placeID).child("type").getValue(String.class));
+                        places.add(transport);
+                    }
+                }
+            }
+        }).addOnFailureListener(e -> {
+            // Handle any exceptions that occur during the database query
+            Log.e("TravelPlanDetailsActivity", "Error retrieving transport data: " + e.getMessage());
+        });
+
+        TimelineAdapter timelineAdapter = new TimelineAdapter();
+
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        timelineAdapter.updateData(places);
+        recyclerView.setAdapter(timelineAdapter);
     }
 
     public void onBackPressed() {
