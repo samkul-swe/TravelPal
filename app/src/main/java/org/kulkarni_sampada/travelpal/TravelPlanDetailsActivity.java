@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,11 +41,16 @@ public class TravelPlanDetailsActivity extends AppCompatActivity {
         getPlanItems();
 
         TextView travelPlanNameTextView = findViewById(R.id.travel_plan_name);
-        TextView travelPlanDetailsTextView = findViewById(R.id.travel_plan_details);
+        Button shareButton = findViewById(R.id.share_button);
 
         travelPlanNameTextView.setText(travelPlan.getTitle());
-        //change later to have more details about the travelPlan
-        travelPlanDetailsTextView.setText("");
+        shareButton.setOnClickListener(v -> shareTravelPlan());
+
+    }
+    
+    public void shareTravelPlan() {
+        // Implement the sharing logic here
+
 
     }
 
