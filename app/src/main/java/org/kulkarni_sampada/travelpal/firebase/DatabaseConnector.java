@@ -35,8 +35,4 @@ public class DatabaseConnector {
         return database.getReference("Meals");
     }
 
-    public DatabaseReference getTransportReference() {
-        return database.getReference("Transport");
-    }
-
 }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -31,7 +30,6 @@ import org.kulkarni_sampada.travelpal.firebase.repository.database.UserRepositor
 import org.kulkarni_sampada.travelpal.gemini.GeminiClient;
 import org.kulkarni_sampada.travelpal.model.Meal;
 import org.kulkarni_sampada.travelpal.model.Place;
-import org.kulkarni_sampada.travelpal.model.Transport;
 import org.kulkarni_sampada.travelpal.model.TravelPlan;
 import org.kulkarni_sampada.travelpal.recycler.PlanItemAdapter;
 
@@ -79,7 +77,7 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
         // Set up Bottom Navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         if (bottomNavigationView == null) {
-            Log.e("RightNowActivity", "bottomNavigationView is null");
+            Log.e("DesignTravelPlanActivity", "bottomNavigationView is null");
         } else {
             bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
                 int itemId = item.getItemId();
@@ -112,11 +110,6 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
                     selectedIDs.add(meal.getId());
                     DatabaseReference mealRef = DatabaseConnector.getInstance().getMealReference().child(meal.getId());
                     mealRef.setValue(meal);
-                } else if (planItem instanceof Transport) {
-                    Transport transport = (Transport) planItem;
-                    selectedIDs.add(transport.getId());
-                    DatabaseReference transportRef = DatabaseConnector.getInstance().getTransportReference().child(transport.getId());
-                    transportRef.setValue(transport);
                 }
             }
             travelPlan.setPlaceIDs(selectedIDs);
@@ -139,6 +132,7 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
             finish();
 
             Intent intent = new Intent(DesignTravelPlanActivity.this, TravelPlanDetailsActivity.class);
+            intent.putExtra("travelPlan", travelPlan);
             startActivity(intent);
             finish();
         }
@@ -159,12 +153,6 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
                 if (meal.getName().toLowerCase().contains(query.toLowerCase()) ||
                         meal.getCuisine().toLowerCase().contains(query.toLowerCase())) {
                     filteredPlanItems.add(meal);
-                }
-            } else if (planItem instanceof Transport) {
-                Transport transport = (Transport) planItem;
-                if (transport.getType().toLowerCase().contains(query.toLowerCase()) ||
-                        transport.getMode().toLowerCase().contains(query.toLowerCase())) {
-                    filteredPlanItems.add(transport);
                 }
             }
         }
@@ -205,11 +193,7 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
                     travelPlan.setBudget("Meals included");
                 }
 
-                if (Boolean.parseBoolean(travelPlan.getTransportIncluded())) {
-                    travelPlan.setBudget("Transport included");
-                }
-
-                String query = "Can you suggest me places in " + travelPlan.getLocation() + "? My budget is " + travelPlan.getBudget() + ". My date and time of availability is " + travelPlan.getStartDate() + " " + travelPlan.getStartTime() + " to " + travelPlan.getEndDate() + " " + travelPlan.getEndTime() + ". My interests are " + interests + " I want the name of the place, suggested time and date to visit, along with brief description. For meals I want suggested place name, suggested cuisine, and expected costs. For transport I want the suggestion of the transport mode that will fall within budget, and the time taken. I want this is a consistent readable format with no Day 1 or Day 2 details. Mention details using titles 'place', 'time', 'description', 'date'.";
+                String query = "Can you suggest me places in " + travelPlan.getLocation() + "? My budget is " + travelPlan.getBudget() + ". My date and time of availability is " + travelPlan.getStartDate() + " " + travelPlan.getStartTime() + " to " + travelPlan.getEndDate() + " " + travelPlan.getEndTime() + ". My interests are " + interests + " I want the name of the place, suggested time and date to visit, along with brief description. For meals I want suggested place name, suggested cuisine, and expected costs. I want this is a consistent readable format with no Day 1 or Day 2 details. Mention details using titles 'place', 'time', 'description', 'date' for places. Mention details using title 'restaurant', 'cuisine', and 'cost' for meals.";
                 ListenableFuture<GenerateContentResponse> response = geminiClient.generateResult(query);
 
                 // Generate trip name using Gemini API
@@ -231,18 +215,55 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
     }
 
     public void extractInfo(String text) {
+        Log.d("Text", text);
+
         planItems = new ArrayList<>();
         String[] lines = text.split("\n");
+        Place place = null;
+        Meal meal = null;
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
             if (line.startsWith("**Place:**")) {
-                Place place = new Place();
+                place = new Place();
                 place.setId("place_" + UUID.randomUUID().toString());
                 String placeName = line.substring(10).trim();
+                if (placeName.startsWith("**")) {
+                    placeName = placeName.substring(2, placeName.length() - 2);
+                }
                 place.setName(placeName);
-                String description = lines[i + 1].substring(14).trim();
+            } if (line.startsWith("**Time:**")) {
+                String time = line.substring(9).trim();
+                place.setTime(time);
+            } if (line.startsWith("**Description:**")) {
+                String description = line.substring(16).trim();
                 place.setDescription(description);
+            } if (line.startsWith("**Date:**")) {
+                String date = line.substring(9).trim();
+                place.setDate(date);
+            } if ((place != null) && !planItems.contains(place)) {
                 planItems.add(place);
+            }
+            if (line.startsWith("**Restaurant:**")) {
+                meal = new Meal();
+                meal.setId("meal_" + UUID.randomUUID().toString());
+                String restaurantName = line.substring(15).trim();
+                if (restaurantName.startsWith("**")) {
+                    restaurantName = restaurantName.substring(2, restaurantName.length() - 2);
+                }
+                int index = restaurantName.indexOf("(");
+                if (index != -1) {
+                    meal.setName(restaurantName.substring(0, index).trim() + restaurantName.substring(index + 1, restaurantName.length() - 1).trim());
+                } else {
+                    meal.setName(restaurantName);
+                }
+            } else if (line.startsWith("**Cuisine:**")) {
+                String cuisine = line.substring(12).trim();
+                meal.setCuisine(cuisine);
+            } else if (line.startsWith("**Cost:**")) {
+                String cost = line.substring(9).trim();
+                meal.setPrice(cost);
+            } if ((meal != null) && !planItems.contains(meal)) {
+                planItems.add(meal);
             }
         }
 
@@ -253,7 +274,6 @@ public class DesignTravelPlanActivity extends AppCompatActivity {
 
         Log.d("PlanItems", planItems.toString());
         updateUI(planItems);
-
     }
 
 

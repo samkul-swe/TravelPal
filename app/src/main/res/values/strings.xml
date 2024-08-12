@@ -40,7 +40,6 @@
     <string name="group_of_3">Group of 3</string>
     <string name="budget_includes">Budget Includes</string>
     <string name="meals">Meals</string>
-    <string name="transport">Transport</string>
     <string name="submit">Submit</string>
     <string name="minimumBudget">$0</string>
     <string name="maximumBudget">$5000</string>

@@ -42,7 +42,7 @@ public class TravelParametersActivity extends AppCompatActivity {
     private TextInputEditText budgetEditText;
     private EditText eventLocationEditText;
     private TextInputEditText eventStartTimeEditText, eventEndTimeEditText, eventStartDateEditText, eventEndDateEditText;
-    private CheckBox mealsCheckbox, transportCheckbox;
+    private CheckBox mealsCheckbox;
     private Button submitButton;
 
     private String uid;
@@ -63,7 +63,7 @@ public class TravelParametersActivity extends AppCompatActivity {
         // Set up Bottom Navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         if (bottomNavigationView == null) {
-            Log.e("RightNowActivity", "bottomNavigationView is null");
+            Log.e("TravelParametersActivity", "bottomNavigationView is null");
         } else {
             bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
                 int itemId = item.getItemId();
@@ -80,7 +80,6 @@ public class TravelParametersActivity extends AppCompatActivity {
         perPersonBudgetRadioButton = findViewById(R.id.per_person_budget_radio_button);
         budgetEditText = findViewById(R.id.budget_amount_edittext);
         mealsCheckbox = findViewById(R.id.meals_checkbox);
-        transportCheckbox = findViewById(R.id.transport_checkbox);
         submitButton = findViewById(R.id.submit_button);
         eventLocationEditText = findViewById(R.id.event_location_edittext);
         eventStartTimeEditText = findViewById(R.id.event_start_time_edittext);
@@ -181,7 +180,6 @@ public class TravelParametersActivity extends AppCompatActivity {
                         travelPlan.setIsPerPersonBudget(String.valueOf(perPersonBudgetRadioButton.isChecked()));
                         travelPlan.setIsTotalBudget(String.valueOf(totalBudgetRadioButton.isChecked()));
                         travelPlan.setMealsIncluded(String.valueOf(mealsCheckbox.isChecked()));
-                        travelPlan.setTransportIncluded(String.valueOf(transportCheckbox.isChecked()));
                         travelPlan.setLocation(eventLocationEditText.getText().toString());
                         travelPlan.setStartDate(Objects.requireNonNull(eventStartTimeEditText.getText()).toString());
                         travelPlan.setEndTime(Objects.requireNonNull(eventEndTimeEditText.getText()).toString());

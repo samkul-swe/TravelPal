@@ -13,14 +13,6 @@ public class User implements Serializable {
 
     public User(){}
 
-    public List<String> getPlannedTrips() {
-        return plannedTrips;
-    }
-
-    public void setPlannedTrips(List<String> plannedTrips) {
-        this.plannedTrips = plannedTrips;
-    }
-
     public List<String> getInterests() {
         return interests;
     }
@@ -45,11 +37,11 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public List<String> getTrips() {
+    public List<String> getPlannedTrips() {
         return plannedTrips;
     }
 
-    public void setTrips(List<String> plannedTrips) {
+    public void setPlannedTrips(List<String> plannedTrips) {
         this.plannedTrips = plannedTrips;
     }
 

@@ -11,15 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 
 import org.kulkarni_sampada.travelpal.firebase.repository.database.MealRepository;
 import org.kulkarni_sampada.travelpal.firebase.repository.database.PlaceRepository;
-import org.kulkarni_sampada.travelpal.firebase.repository.database.TransportRepository;
 import org.kulkarni_sampada.travelpal.model.Meal;
 import org.kulkarni_sampada.travelpal.model.Place;
-import org.kulkarni_sampada.travelpal.model.Transport;
 import org.kulkarni_sampada.travelpal.model.TravelPlan;
 import org.kulkarni_sampada.travelpal.recycler.TimelineAdapter;
 
@@ -49,30 +46,12 @@ public class TravelPlanDetailsActivity extends AppCompatActivity {
         //change later to have more details about the travelPlan
         travelPlanDetailsTextView.setText("");
 
-        // Set up Bottom Navigation
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        if (bottomNavigationView == null) {
-            Log.e("RightNowActivity", "bottomNavigationView is null");
-        } else {
-            bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-                int itemId = item.getItemId();
-                if (itemId == R.id.navigation_budget) {
-                    startActivity(new Intent(TravelPlanDetailsActivity.this, UserProfileActivity.class));
-                    return true;
-                } else if (itemId == R.id.navigation_profile) {
-                    startActivity(new Intent(TravelPlanDetailsActivity.this, UserProfileActivity.class));
-                    return true;
-                }
-                return false;
-            });
-        }
     }
 
     public void getPlanItems() {
 
         PlaceRepository placeRepository = new PlaceRepository();
         MealRepository mealRepository = new MealRepository();
-        TransportRepository transportRepository = new TransportRepository();
         places = new ArrayList<>();
 
         Task<DataSnapshot> task = placeRepository.getPlaceRef().get();
@@ -114,26 +93,6 @@ public class TravelPlanDetailsActivity extends AppCompatActivity {
         }).addOnFailureListener(e -> {
             // Handle any exceptions that occur during the database query
             Log.e("TravelPlanDetailsActivity", "Error retrieving meal data: " + e.getMessage());
-        });
-
-        task = transportRepository.getTransportRef().get();
-        task.addOnSuccessListener(dataSnapshot -> {
-            if (dataSnapshot.exists()) {
-                for (String placeID : travelPlan.getPlaceIDs()) {
-                    if (placeID.contains("transport")) {
-                        Transport transport = new Transport();
-                        transport.setId(placeID);
-                        transport.setTime(dataSnapshot.child(placeID).child("time").getValue(String.class));
-                        transport.setMode(dataSnapshot.child(placeID).child("mode").getValue(String.class));
-                        transport.setCost(dataSnapshot.child(placeID).child("cost").getValue(String.class));
-                        transport.setType(dataSnapshot.child(placeID).child("type").getValue(String.class));
-                        places.add(transport);
-                    }
-                }
-            }
-        }).addOnFailureListener(e -> {
-            // Handle any exceptions that occur during the database query
-            Log.e("TravelPlanDetailsActivity", "Error retrieving transport data: " + e.getMessage());
         });
 
         TimelineAdapter timelineAdapter = new TimelineAdapter();

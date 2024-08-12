@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.kulkarni_sampada.travelpal.R;
 import org.kulkarni_sampada.travelpal.model.Meal;
 import org.kulkarni_sampada.travelpal.model.Place;
-import org.kulkarni_sampada.travelpal.model.Transport;
 
 import java.util.List;
 
@@ -56,11 +55,6 @@ public class PlanItemAdapter extends RecyclerView.Adapter<PlanItemAdapter.ViewHo
             holder.imageView.setImageResource(R.drawable.ic_meal);
             holder.titleTextView.setText(meal.getName());
             holder.descriptionTextView.setText(meal.getCuisine());
-        } else if (planItem instanceof Transport) {
-            Transport transport = (Transport) planItem;
-            holder.imageView.setImageResource(R.drawable.ic_transport);
-            holder.titleTextView.setText(transport.getType());
-            holder.descriptionTextView.setText(transport.getMode());
         }
         holder.itemView.setOnLongClickListener(v -> {
             v.setSelected(!v.isSelected());

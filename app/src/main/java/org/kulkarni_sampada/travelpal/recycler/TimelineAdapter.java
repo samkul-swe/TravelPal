@@ -14,7 +14,6 @@ import com.github.vipulasri.timelineview.TimelineView;
 import org.kulkarni_sampada.travelpal.R;
 import org.kulkarni_sampada.travelpal.model.Meal;
 import org.kulkarni_sampada.travelpal.model.Place;
-import org.kulkarni_sampada.travelpal.model.Transport;
 
 import java.util.List;
 
@@ -56,10 +55,6 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
             holder.message.setText(meal.getName());
             holder.date.setVisibility(View.GONE);
 
-        } else if (planItem instanceof Transport) {
-            Transport transport = (Transport) planItem;
-            holder.message.setText(transport.getType() + " " + transport.getMode());
-            holder.date.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(v -> handlePlanItemClick(planItem));

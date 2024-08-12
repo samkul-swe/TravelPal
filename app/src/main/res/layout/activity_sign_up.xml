@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/textview_signup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_up"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/name_edittext"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <EditText
+        android:id="@+id/name_edittext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@color/white"
+        android:hint="@string/enter_name"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        android:textColorHint="#757575"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_signup"
+        app:layout_constraintBottom_toTopOf="@+id/email_edittext"
+        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+    <EditText
+        android:id="@+id/email_edittext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@color/white"
+        android:hint="@string/enter_email"
+        android:textColor="@color/black"
+        android:importantForAutofill="no"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:textColorHint="#757575"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name_edittext"
+        app:layout_constraintBottom_toTopOf="@+id/password_edittext"
+        tools:ignore="VisualLintTextFieldSize" />
+
+    <EditText
+        android:id="@+id/password_edittext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@color/white"
+        android:hint="@string/enter_password"
+        android:textColor="@color/black"
+        android:importantForAutofill="no"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:textColorHint="#757575"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_edittext"
+        app:layout_constraintBottom_toTopOf="@+id/signup_button"
+        tools:ignore="VisualLintTextFieldSize" />
+
+    <Button
+        android:id="@+id/signup_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/sign_up"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password_edittext"
+        tools:ignore="DuplicateSpeakableTextCheck,HardcodedText,TextContrastCheck,VisualLintButtonSize" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

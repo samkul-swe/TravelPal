@@ -8,7 +8,6 @@ public class TravelPlan implements Serializable {
     private String isTotalBudget;
     private String isPerPersonBudget;
     private String mealsIncluded;
-    private String transportIncluded;
     private String location;
     private String startDate;
     private String startTime;
@@ -34,14 +33,6 @@ public class TravelPlan implements Serializable {
 
     public void setMealsIncluded(String mealsIncluded) {
         this.mealsIncluded = mealsIncluded;
-    }
-
-    public String getTransportIncluded() {
-        return transportIncluded;
-    }
-
-    public void setTransportIncluded(String transportIncluded) {
-        this.transportIncluded = transportIncluded;
     }
 
     public String getIsTotalBudget() {
@@ -131,7 +122,6 @@ public class TravelPlan implements Serializable {
                 ", isTotalBudget='" + isTotalBudget + '\'' +
                 ", isPerPersonBudget='" + isPerPersonBudget + '\'' +
                 ", mealsIncluded='" + mealsIncluded + '\'' +
-                ", transportIncluded='" + transportIncluded + '\'' +
                 ", location='" + location + '\'' +
                 ", startDate='" + startDate + '\'' +
                 ", startTime='" + startTime + '\'' +
