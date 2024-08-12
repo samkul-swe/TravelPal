@@ -1,11 +1,22 @@
 package org.kulkarni_sampada.travelpal.model;
 
-public class Meal extends PlanItem {
+import java.io.Serializable;
+
+public class Meal implements Serializable {
+    private String id;
     private String name;
     private String price;
     private String cuisine;
 
     Meal() {}
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -29,5 +40,15 @@ public class Meal extends PlanItem {
 
     public void setCuisine(String cuisine) {
         this.cuisine = cuisine;
+    }
+
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                ", cuisine='" + cuisine + '\'' +
+                '}';
     }
 }

@@ -1,12 +1,23 @@
 package org.kulkarni_sampada.travelpal.model;
 
-public class Transport extends PlanItem {
+import java.io.Serializable;
+
+public class Transport implements Serializable {
+    private String id;
     private String type;
     private String mode;
     private String time;
     private String cost;
 
     Transport() {}
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getType() {
         return type;
@@ -38,5 +49,16 @@ public class Transport extends PlanItem {
 
     public void setCost(String cost) {
         this.cost = cost;
+    }
+
+    @Override
+    public String toString() {
+        return "Transport{" +
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", mode='" + mode + '\'' +
+                ", time='" + time + '\'' +
+                ", cost='" + cost + '\'' +
+                '}';
     }
 }

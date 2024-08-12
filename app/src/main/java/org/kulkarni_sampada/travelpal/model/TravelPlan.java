@@ -123,4 +123,23 @@ public class TravelPlan implements Serializable {
     public void setPlaceIDs(List<String> placeIDs) {
         this.placeIDs = placeIDs;
     }
+
+    @Override
+    public String toString() {
+        return "TravelPlan{" +
+                "budget='" + budget + '\'' +
+                ", isTotalBudget='" + isTotalBudget + '\'' +
+                ", isPerPersonBudget='" + isPerPersonBudget + '\'' +
+                ", mealsIncluded='" + mealsIncluded + '\'' +
+                ", transportIncluded='" + transportIncluded + '\'' +
+                ", location='" + location + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", planID='" + planID + '\'' +
+                ", title='" + title + '\'' +
+                ", placeIDs=" + placeIDs +
+                '}';
+    }
 }

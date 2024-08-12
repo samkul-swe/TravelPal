@@ -57,4 +57,7 @@
     <string name="total_budget">Total Budget</string>
     <string name="per_person_budget">Per person budget</string>
     <string name="budget_amount">Amount</string>
+    <string name="title_home">Home</string>
+    <string name="title_budget">Budget</string>
+    <string name="title_profile">Profile</string>
 </resources>

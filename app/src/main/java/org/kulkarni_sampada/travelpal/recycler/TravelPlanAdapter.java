@@ -25,7 +25,7 @@ public class TravelPlanAdapter extends RecyclerView.Adapter<TravelPlanAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_trip, parent, false);
+                .inflate(R.layout.item_travel_plan, parent, false);
         return new ViewHolder(view);
     }
 
@@ -41,10 +41,10 @@ public class TravelPlanAdapter extends RecyclerView.Adapter<TravelPlanAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TravelPlan travelPlan = travelPlans.get(position);
 
-        holder.tripNameTextView.setText(travelPlan.getTitle());
-        holder.tripDateTextView.setText(travelPlan.getStartDate());
-        holder.tripDestinationTextView.setText(travelPlan.getLocation());
-        holder.itemView.setOnClickListener(v -> handleTripClick(travelPlan));
+        holder.travelPlanNameTextView.setText(travelPlan.getTitle());
+        holder.travelPlanDateTextView.setText(travelPlan.getStartDate());
+        holder.travelPlanNameLocationView.setText(travelPlan.getLocation());
+        holder.itemView.setOnClickListener(v -> handleTravelPlanClick(travelPlan));
 
     }
 
@@ -53,7 +53,7 @@ public class TravelPlanAdapter extends RecyclerView.Adapter<TravelPlanAdapter.Vi
         return travelPlans.size();
     }
 
-    private void handleTripClick(TravelPlan travelPlan) {
+    private void handleTravelPlanClick(TravelPlan travelPlan) {
         // Handle the travelPlan click event
         if (listener != null) {
             listener.onItemClick(travelPlan);
@@ -61,15 +61,15 @@ public class TravelPlanAdapter extends RecyclerView.Adapter<TravelPlanAdapter.Vi
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tripNameTextView;
-        public TextView tripDateTextView;
-        public TextView tripDestinationTextView;
+        public TextView travelPlanNameTextView;
+        public TextView travelPlanDateTextView;
+        public TextView travelPlanNameLocationView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tripNameTextView = itemView.findViewById(R.id.trip_name);
-            tripDateTextView = itemView.findViewById(R.id.trip_date);
-            tripDestinationTextView = itemView.findViewById(R.id.trip_destination);
+            travelPlanNameTextView = itemView.findViewById(R.id.trip_name);
+            travelPlanDateTextView = itemView.findViewById(R.id.trip_date);
+            travelPlanNameLocationView = itemView.findViewById(R.id.trip_name_location);
         }
     }
 }

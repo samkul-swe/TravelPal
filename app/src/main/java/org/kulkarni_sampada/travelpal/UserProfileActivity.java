@@ -8,16 +8,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Picasso;
@@ -33,14 +39,22 @@ import java.util.List;
 
 public class UserProfileActivity extends AppCompatActivity {
 
+    private TextView interestsTextView;
+    private TextView campusTextView;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference databaseReference;
     private ActivityResultLauncher<Intent> launcher;
     private ImageView userProfileImage;
     private Uri imageUri;
     private String uid;
     private User user;
     private UserRepository userRepository;
+    private UserProfileRepository userProfileRepo;
     private TextView userNameTextView;
-    private List<TravelPlan> travelPlans;
+    private List<Trip> trips;
+    private static final int REQUEST_CAMERA_PERMISSION = 100;
+    private Button adminConsoleButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +100,30 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             }
         );
+
+        // Set up Bottom Navigation
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView == null) {
+            Log.e("RightNowActivity", "bottomNavigationView is null");
+        } else {
+            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int itemId = item.getItemId();
+                    if (itemId == R.id.navigation_home) {
+                        startActivity(new Intent(UserProfileActivity.this, RightNowActivity.class));
+                        return true;
+                    } else if (itemId == R.id.navigation_budget) {
+                        startActivity(new Intent(UserProfileActivity.this, TravelParametersActivity.class));
+                        return true;
+                    } else if (itemId == R.id.navigation_profile) {
+                        startActivity(new Intent(UserProfileActivity.this, UserProfileActivity.class));
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
     // Method to launch the image picker

@@ -12,18 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.kulkarni_sampada.travelpal.R;
 import org.kulkarni_sampada.travelpal.model.Meal;
 import org.kulkarni_sampada.travelpal.model.Place;
-import org.kulkarni_sampada.travelpal.model.PlanItem;
 import org.kulkarni_sampada.travelpal.model.Transport;
 
 import java.util.List;
 
 public class PlanItemAdapter extends RecyclerView.Adapter<PlanItemAdapter.ViewHolder> {
-    private List<PlanItem> planItems;
+    private List<Object> planItems;
     private PlanItemAdapter.OnItemSelectListener selectListener;
 
     public PlanItemAdapter() {}
 
-    public void updateData(List<PlanItem> planItems) {
+    public void updateData(List<Object> planItems) {
         this.planItems = planItems;
     }
 
@@ -36,7 +35,7 @@ public class PlanItemAdapter extends RecyclerView.Adapter<PlanItemAdapter.ViewHo
     }
 
     public interface OnItemSelectListener {
-        void onItemSelect(PlanItem planItem);
+        void onItemSelect(Object planItem);
     }
 
     public void setOnItemSelectListener(PlanItemAdapter.OnItemSelectListener listener) {
@@ -45,7 +44,7 @@ public class PlanItemAdapter extends RecyclerView.Adapter<PlanItemAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PlanItem planItem = planItems.get(position);
+        Object planItem = planItems.get(position);
 
         if(planItem instanceof Place) {
             Place place = (Place) planItem;
@@ -81,7 +80,7 @@ public class PlanItemAdapter extends RecyclerView.Adapter<PlanItemAdapter.ViewHo
         return planItems.size();
     }
 
-    private void handlePlanItemSelect(PlanItem planItem) {
+    private void handlePlanItemSelect(Object planItem) {
         if (selectListener != null) {
             selectListener.onItemSelect(planItem);
         }

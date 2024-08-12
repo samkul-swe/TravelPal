@@ -2,7 +2,8 @@ package org.kulkarni_sampada.travelpal.model;
 
 import java.io.Serializable;
 
-public class Place extends PlanItem implements Serializable {
+public class Place implements Serializable {
+    private String id;
     private String name;
     private String time;
     private String date;
@@ -10,6 +11,14 @@ public class Place extends PlanItem implements Serializable {
     private String price;
 
     public Place() {}
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -49,6 +58,18 @@ public class Place extends PlanItem implements Serializable {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Place{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", time='" + time + '\'' +
+                ", date='" + date + '\'' +
+                ", description='" + description + '\'' +
+                ", price='" + price + '\'' +
+                '}';
     }
 }
 

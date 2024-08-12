@@ -4,13 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 
 import org.kulkarni_sampada.travelpal.firebase.repository.database.EventRepository;
@@ -32,44 +35,48 @@ public class TravelPlanDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trip_details);
+        setContentView(R.layout.activity_travel_plan_details);
 
         travelPlan = (TravelPlan) getIntent().getSerializableExtra("travelPlan");
 
         // Fetch the places of the travelPlan
-        getEvents();
+        getPlanItems();
 
-        TextView tripNameTextView = findViewById(R.id.trip_name);
-        TextView tripBudgetTextView = findViewById(R.id.trip_budget);
-        TextView tripPreferencesTextView = findViewById(R.id.trip_preferences);
-        TextView tripTimeTextView = findViewById(R.id.trip_time);
+        TextView travelPlanNameTextView = findViewById(R.id.travel_plan_name);
+        TextView travelPlanDetailsTextView = findViewById(R.id.travel_plan_details);
 
-        tripNameTextView.setText(travelPlan.getTitle());
-        tripTimeTextView.setText(getCurrentTimeString(Long.parseLong(travelPlan.getTripID())));
-        tripBudgetTextView.setText("Budget from $" + travelPlan.getMinBudget() + " - $" + travelPlan.getMaxBudget());
-        boolean mealsIncluded = Boolean.parseBoolean(travelPlan.getMealsIncluded());
-        boolean transportIncluded = Boolean.parseBoolean(travelPlan.getTransportIncluded());
+        travelPlanNameTextView.setText(travelPlan.getTitle());
+        //change later to have more details about the travelPlan
+        travelPlanDetailsTextView.setText("");
 
-        if (mealsIncluded && !transportIncluded) {
-            tripPreferencesTextView.setText("Meal included in budget");
-        } else if (!mealsIncluded && transportIncluded) {
-            tripPreferencesTextView.setText("Transportation included in budget");
-        } else if (mealsIncluded && transportIncluded) {
-            tripPreferencesTextView.setText("Transportation and meals included in budget");
-        } else if (!mealsIncluded && !transportIncluded) {
-            tripPreferencesTextView.setText("Budget only for the travelPlan. No meals or transportation included");
+        // Set up Bottom Navigation
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView == null) {
+            Log.e("RightNowActivity", "bottomNavigationView is null");
+        } else {
+            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int itemId = item.getItemId();
+                    if (itemId == R.id.navigation_home) {
+                        startActivity(new Intent(AdminConsole.this, RightNowActivity.class));
+                        return true;
+                    } else if (itemId == R.id.navigation_budget) {
+                        startActivity(new Intent(AdminConsole.this, PlanningTripActivity.class));
+                        return true;
+                    } else if (itemId == R.id.navigation_profile) {
+                        startActivity(new Intent(AdminConsole.this, ProfileActivity.class));
+                        return true;
+                    }
+                    return false;
+                }
+            });
         }
     }
 
-    private static String getCurrentTimeString(long millis) {
-        DateFormat dateTimeFormat = DateFormat.getDateTimeInstance();
-        Date currentDate = new Date(millis);
-        return dateTimeFormat.format(currentDate);
-    }
+    public void getPlanItems() {
 
-    public void getEvents() {
-
-        EventRepository eventRepository = new EventRepository();
+        Place eventRepository = new EventRepository();
         places = new ArrayList<>();
 
         Task<DataSnapshot> task = eventRepository.getEventRef().get();

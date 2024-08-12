@@ -1,8 +1,10 @@
 package org.kulkarni_sampada.travelpal.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
+
     private String userID;
     private String name;
     private List<String> plannedTrips; // list of trip IDs
@@ -59,7 +61,14 @@ public class User {
         this.placesVisited = placesVisited;
     }
 
+    @Override
     public String toString() {
-        return userID + " " + name + " " + plannedTrips + " " + placesVisited + " " + interests;
+        return "User{" +
+                "userID='" + userID + '\'' +
+                ", name='" + name + '\'' +
+                ", plannedTrips=" + plannedTrips +
+                ", placesVisited=" + placesVisited +
+                ", interests=" + interests +
+                '}';
     }
 }

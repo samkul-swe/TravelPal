@@ -1,5 +1,6 @@
 package org.kulkarni_sampada.travelpal.recycler;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +12,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.vipulasri.timelineview.TimelineView;
 
 import org.kulkarni_sampada.travelpal.R;
-import org.kulkarni_sampada.travelpal.model.PlanItem;
+import org.kulkarni_sampada.travelpal.model.Meal;
+import org.kulkarni_sampada.travelpal.model.Place;
+import org.kulkarni_sampada.travelpal.model.Transport;
 
 import java.util.List;
 
 public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder> {
-    private List<PlanItem> planItems;
+    private List<Object> planItems;
     private TimelineAdapter.OnItemClickListener listener;
 
     public TimelineAdapter() {}
 
-    public void updateData(List<PlanItem> planItems) {
+    public void updateData(List<Object> planItems) {
         this.planItems = planItems;
     }
 
@@ -38,21 +41,37 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
         return new TimelineViewHolder(view, viewType);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(TimelineViewHolder holder, int position) {
-        PlanItem planItem = planItems.get(position);
+    public void onBindViewHolder(@NonNull TimelineViewHolder holder, int position) {
+        Object planItem = planItems.get(position);
 
-        holder.date.setText(planItem.getDate());
-        holder.message.setText(event.getTitle());
-        holder.itemView.setOnClickListener(v -> handleEventClick(event));
+        if (planItem instanceof Place) {
+            Place place = (Place) planItem;
+            holder.timeline.setMarker(R.drawable.ic_place);
+            holder.date.setText(place.getDate());
+            holder.message.setText(place.getName());
+
+        } else if (planItem instanceof Meal) {
+            Meal meal = (Meal) planItem;
+            holder.timeline.setMarker(R.drawable.ic_meal);
+            holder.message.setText(meal.getName());
+
+        } else if (planItem instanceof Transport) {
+            Transport transport = (Transport) planItem;
+            holder.timeline.setMarker(R.drawable.ic_transport);
+            holder.message.setText(transport.getType() + " " + transport.getMode());
+        }
+
+        holder.itemView.setOnClickListener(v -> handlePlanItemClick(planItem));
     }
 
     @Override
     public int getItemCount() {
-        return events.size();
+        return planItems.size();
     }
 
-    static class TimelineViewHolder extends RecyclerView.ViewHolder {
+    public static class TimelineViewHolder extends RecyclerView.ViewHolder {
 
         final TextView date;
         final TextView message;
@@ -68,14 +87,14 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
     }
 
     public interface OnItemClickListener {
-        void onItemClick(PlanItem planItem);
+        void onItemClick(Object planItem);
     }
 
     public void setOnItemClickListener(TimelineAdapter.OnItemClickListener listener) {
         this.listener = listener;
     }
 
-    private void handlePlanItemClick(PlanItem planItem) {
+    private void handlePlanItemClick(Object planItem) {
         // Handle the event click event
         if (listener != null) {
             listener.onItemClick(planItem);
