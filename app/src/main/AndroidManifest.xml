@@ -19,24 +19,6 @@
         android:theme="@style/Theme.TravelPal"
         tools:targetApi="31">
         <activity
-            android:name=".InterestsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DesignTravelPlanActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TravelPlanDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".UserProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TravelParametersActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
