@@ -1,16 +1,13 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.TravelPal.Night" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/muted_green_dark</item>
-        <item name="colorPrimaryVariant">@color/muted_green_dark</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/primary_dark</item>
-        <item name="colorSecondaryVariant">@color/primary_dark</item>
-        <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+    </style>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.TravelPal" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
 </resources>
