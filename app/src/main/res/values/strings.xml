@@ -111,4 +111,5 @@
     <string name="enter_location">Enter Location</string>
     <string name="use_current_location">Use Current Location</string>
     <string name="get_weather">Get Weather</string>
+    <string name="enter_date_yyyy_mm_dd">Enter date (yyyy-MM-dd)</string>
 </resources>

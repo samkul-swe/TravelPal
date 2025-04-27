@@ -14,6 +14,18 @@ public interface OpenWeatherAPIInterface {
             @Query("appid") String apiKey
     );
 
+    @GET("data/2.5/forecast/daily?")
+    Call<WeatherResponseList> getForecast(
+            @Query("lat") String latitude,
+            @Query("lon") String longitude,
+            @Query("cnt") int count,
+            @Query("appid") String apiKey
+    );
+
     @GET("geo/1.0/direct?")
-    Call<List<Location>> getLocation(@Query("q") String location, @Query("limit") int limit, @Query("appid") String apiKey);
+    Call<List<Location>> getLocation(
+            @Query("q") String location,
+            @Query("limit") int limit,
+            @Query("appid") String apiKey
+    );
 }

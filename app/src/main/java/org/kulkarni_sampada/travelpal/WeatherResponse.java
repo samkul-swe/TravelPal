@@ -8,6 +8,10 @@ public class WeatherResponse {
     public List<Weather> weather; // List of Weather objects
 }
 
+class WeatherResponseList {
+    public List<WeatherResponse> list;
+}
+
 class Weather {
     @SerializedName("main")
     public String main;

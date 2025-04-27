@@ -26,12 +26,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"/>
 
+    <EditText
+        android:id="@+id/editTextDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/buttonGetLocation"
+        app:layout_constraintStart_toStartOf="@+id/buttonSubmit"
+        android:hint="@string/enter_date_yyyy_mm_dd" />
+
     <Button
         android:id="@+id/buttonSubmit"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/get_weather"
-        app:layout_constraintTop_toBottomOf="@+id/buttonGetLocation"
+        app:layout_constraintTop_toBottomOf="@+id/editTextDate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"/>
