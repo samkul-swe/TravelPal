@@ -13,13 +13,18 @@
 * **Sharing Capabilities:** Share your travel plans with friends and family.
 * **Firebase Integration:**  Uses Firebase for user authentication, data storage, and potentially real-time features.
 
+## Architecture
+- **Frontend:** Android (Java) with Material Design
+- **Backend:** Firebase Authentication & Realtime Database  
+- **AI Integration:** Gemini API for natural language preference processing
+- **Maps:** Google Maps SDK for route optimization
+- **Offline Support:** Local SQLite caching for itineraries
 
-## Technology Stack
-
-* **Frontend:** Android Studio (Java)
-* **Backend (as a service):** Firebase (Authentication, Realtime Database/Firestore)
-* **API Integration:** Gemini API
-* **Mapping Library:** Google Maps SDK for Android
+## Key Features
+- Budget-constraint algorithms
+- Multi-day itinerary planning
+- Real-time collaborative trip planning
+- Offline map access
 
 
 ## Future Development
