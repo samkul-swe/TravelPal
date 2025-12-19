@@ -1,5 +1,6 @@
 package org.kulkarni_sampada.travelpal.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
@@ -156,6 +157,16 @@ public class TripPlannerViewModel extends AndroidViewModel {
             return;
         }
 
+        // Determine the origin location
+        Location originLocation;
+        if (selection.hasSelections()) {
+            // Travel from last selected activity
+            originLocation = selection.getCurrentLocation();
+        } else {
+            // First activity - travel from start location
+            originLocation = trip.getMetadata().getStartLocation();
+        }
+
         // Check budget
         if (!selection.canAfford(activity)) {
             String warning = selection.getBudgetWarning(activity);
@@ -165,42 +176,84 @@ public class TripPlannerViewModel extends AndroidViewModel {
 
         // Calculate travel time
         isLoading.setValue(true);
-        calculateTravelTime(selection.getCurrentLocation(), activity.getLocation(),
+        calculateTravelTime(originLocation, activity.getLocation(),
                 trip.getMetadata().getTransportationMode(), new OnTravelTimeCalculatedListener() {
+                    @SuppressLint("DefaultLocale")
                     @Override
                     public void onSuccess(int travelTimeMinutes) {
-                        isLoading.setValue(false);
+                        mainHandler.post(() -> {
+                            isLoading.setValue(false);
 
-                        // Check time conflict
-                        if (selection.hasTimeConflict(activity, travelTimeMinutes)) {
-                            errorMessage.setValue(
-                                    String.format("Time conflict! You need %d minutes travel time, " +
-                                            "but this activity starts too soon.", travelTimeMinutes)
-                            );
-                            return;
-                        }
+                            // Check if this is the first activity and requires early departure
+                            if (!selection.hasSelections()) {
+                                // First activity - check if user needs to leave before trip start time
+                                String tripStartTime = trip.getMetadata().getTimeRange().getStart();
+                                String activityStartTime = activity.getTimeSlot().getSuggestedStart();
 
-                        // Add to selection
-                        selection.addActivity(activity);
-                        activity.setTravelTimeFromPrevious(travelTimeMinutes);
-                        activity.setState(Activity.ActivityState.SELECTED);
+                                if (needsEarlyDeparture(tripStartTime, activityStartTime, travelTimeMinutes)) {
+                                    activity.setNeedsEarlyDeparture(true);
+                                }
+                            }
 
-                        // Update LiveData
-                        userSelection.setValue(selection);
+                            // Check time conflict
+                            if (selection.hasTimeConflict(activity, travelTimeMinutes)) {
+                                errorMessage.setValue(
+                                        String.format("Time conflict! You need %d minutes travel time, " +
+                                                "but this activity starts too soon.", travelTimeMinutes)
+                                );
+                                return;
+                            }
 
-                        // Update states of all activities
-                        updateAllActivityStates();
+                            // Add to selection
+                            selection.addActivity(activity);
+                            activity.setTravelTimeFromPrevious(travelTimeMinutes);
+                            activity.setState(Activity.ActivityState.SELECTED);
 
-                        successMessage.setValue("Activity added: " + activity.getName());
-                        Log.d(TAG, "Activity selected: " + activity.getName());
+                            // Update LiveData
+                            userSelection.setValue(selection);
+
+                            // Update states of all activities
+                            updateAllActivityStates();
+
+                            // After selection, check if we should generate travel or lunch options
+                            checkForDynamicGeneration(selection, trip);
+
+                            successMessage.setValue("Activity added: " + activity.getName());
+                            Log.d(TAG, "Activity selected: " + activity.getName());
+                        });
                     }
 
                     @Override
                     public void onError(String error) {
-                        isLoading.setValue(false);
-                        errorMessage.setValue("Failed to calculate travel time: " + error);
+                        mainHandler.post(() -> {
+                            isLoading.setValue(false);
+                            errorMessage.setValue("Failed to calculate travel time: " + error);
+                        });
                     }
                 });
+    }
+
+    /**
+     * Check if user needs to leave before trip start time
+     */
+    private boolean needsEarlyDeparture(String tripStartTime, String activityStartTime, int travelMinutes) {
+        try {
+            java.time.LocalTime tripStart = java.time.LocalTime.parse(tripStartTime);
+            java.time.LocalTime activityStart = java.time.LocalTime.parse(activityStartTime);
+            java.time.LocalTime requiredDeparture = activityStart.minusMinutes(travelMinutes);
+
+            return requiredDeparture.isBefore(tripStart);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if we should generate lunch or travel options
+     */
+    private void checkForDynamicGeneration(UserSelection selection, Trip trip) {
+        // This will be called from the Activity when user taps suggestion banner
+        // For now, just a placeholder
     }
 
     /**
@@ -324,12 +377,13 @@ public class TripPlannerViewModel extends AndroidViewModel {
     }
 
     /**
-     * Load a trip from Firebase
+     * Load a trip from Firebase with real-time updates
      */
     public void loadTrip(String tripId) {
         isLoading.setValue(true);
 
-        tripRepository.getTrip(tripId).observeForever(trip -> {
+        // Listen to real-time updates
+        tripRepository.listenToSharedTrip(tripId).observeForever(trip -> {
             isLoading.setValue(false);
 
             if (trip != null) {
@@ -338,10 +392,31 @@ public class TripPlannerViewModel extends AndroidViewModel {
                 userSelection.setValue(trip.getUserSelection());
                 updateAllActivityStates();
 
-                successMessage.setValue("Trip loaded successfully!");
-                Log.d(TAG, "Trip loaded: " + tripId);
+                successMessage.setValue("Trip updated!");
+                Log.d(TAG, "Trip loaded/updated: " + tripId);
             } else {
                 errorMessage.setValue("Trip not found");
+            }
+        });
+    }
+
+    /**
+     * Enable real-time collaboration for current trip
+     */
+    public void enableRealtimeSync(String tripId) {
+        tripRepository.listenToSharedTrip(tripId).observeForever(trip -> {
+            if (trip != null) {
+                // Only update if trip changed
+                Trip current = currentTrip.getValue();
+                if (current == null || current.getLastModified() < trip.getLastModified()) {
+                    currentTrip.setValue(trip);
+                    availableActivities.setValue(trip.getActivities());
+                    userSelection.setValue(trip.getUserSelection());
+                    updateAllActivityStates();
+
+                    successMessage.setValue("Trip updated by collaborator!");
+                    Log.d(TAG, "Real-time update received");
+                }
             }
         });
     }

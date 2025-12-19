@@ -2,7 +2,6 @@ package org.kulkarni_sampada.travelpal.repository;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -93,13 +92,13 @@ public class TripRepository {
                 .child(tripId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onDataChange(DataSnapshot snapshot) {
                         Trip trip = snapshot.getValue(Trip.class);
                         tripLiveData.setValue(trip);
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(DatabaseError error) {
                         Log.e(TAG, "Failed to get trip", error.toException());
                         tripLiveData.setValue(null);
                     }
@@ -117,7 +116,7 @@ public class TripRepository {
         getUserTripsRef()
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onDataChange(DataSnapshot snapshot) {
                         List<Trip> trips = new ArrayList<>();
                         for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
                             Trip trip = tripSnapshot.getValue(Trip.class);
@@ -129,7 +128,7 @@ public class TripRepository {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(DatabaseError error) {
                         Log.e(TAG, "Failed to get trips", error.toException());
                         tripsLiveData.setValue(new ArrayList<>());
                     }
@@ -220,7 +219,7 @@ public class TripRepository {
         databaseRef.child(SHARED_TRIPS_PATH)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onDataChange(DataSnapshot snapshot) {
                         List<Trip> sharedTrips = new ArrayList<>();
 
                         for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
@@ -236,7 +235,7 @@ public class TripRepository {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(DatabaseError error) {
                         Log.e(TAG, "Failed to get shared trips", error.toException());
                         sharedTripsLiveData.setValue(new ArrayList<>());
                     }
@@ -274,6 +273,33 @@ public class TripRepository {
     }
 
     /**
+     * Listen to real-time updates on a shared trip
+     */
+    public LiveData<Trip> listenToSharedTrip(String tripId) {
+        MutableLiveData<Trip> tripLiveData = new MutableLiveData<>();
+
+        databaseRef.child(SHARED_TRIPS_PATH)
+                .child(tripId)
+                .child("tripData")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        Trip trip = snapshot.getValue(Trip.class);
+                        tripLiveData.setValue(trip);
+                        Log.d(TAG, "Trip updated in real-time: " + tripId);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.e(TAG, "Failed to listen to trip updates", error.toException());
+                        tripLiveData.setValue(null);
+                    }
+                });
+
+        return tripLiveData;
+    }
+
+    /**
      * Search trips by destination
      */
     public LiveData<List<Trip>> searchTripsByDestination(String destination) {
@@ -285,7 +311,7 @@ public class TripRepository {
                 .endAt(destination + "\uf8ff")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onDataChange(DataSnapshot snapshot) {
                         List<Trip> trips = new ArrayList<>();
                         for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
                             Trip trip = tripSnapshot.getValue(Trip.class);
@@ -297,7 +323,7 @@ public class TripRepository {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(DatabaseError error) {
                         Log.e(TAG, "Search failed", error.toException());
                         searchResults.setValue(new ArrayList<>());
                     }

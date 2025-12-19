@@ -14,6 +14,7 @@ public class TripMetadata {
     private boolean budgetIncludesLunch;
     private boolean budgetIncludesTravel;
     private TransportMode transportationMode;
+    private Location startLocation; // User's starting point (home/hotel)
 
     // Transport Mode Enum
     public enum TransportMode {
@@ -136,6 +137,14 @@ public class TripMetadata {
 
     public void setTransportationMode(TransportMode transportationMode) {
         this.transportationMode = transportationMode;
+    }
+
+    public Location getStartLocation() {
+        return startLocation;
+    }
+
+    public void setStartLocation(Location startLocation) {
+        this.startLocation = startLocation;
     }
 
     // Helper methods

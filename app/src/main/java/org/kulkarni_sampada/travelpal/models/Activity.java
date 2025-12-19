@@ -1,6 +1,6 @@
 package org.kulkarni_sampada.travelpal.models;
 
-import androidx.annotation.NonNull;
+import android.annotation.SuppressLint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,13 @@ public class Activity {
     private Double studentDiscountAmount;
     private Accessibility accessibility;
     private List<String> dietaryOptions;
+    private String recommendedExperience; // e.g., "Best at sunset", "Book in advance"
+    private boolean isTransportOption; // True if this is a travel option between places
 
     // State management (not stored in Firebase, calculated dynamically)
     private transient ActivityState state;
     private transient int travelTimeFromPrevious; // in minutes
+    private transient boolean needsEarlyDeparture; // True if user needs to leave before trip start time
 
     // Activity Category Enum
     public enum ActivityCategory {
@@ -224,6 +227,30 @@ public class Activity {
         this.travelTimeFromPrevious = travelTimeFromPrevious;
     }
 
+    public String getRecommendedExperience() {
+        return recommendedExperience;
+    }
+
+    public void setRecommendedExperience(String recommendedExperience) {
+        this.recommendedExperience = recommendedExperience;
+    }
+
+    public boolean isTransportOption() {
+        return isTransportOption;
+    }
+
+    public void setTransportOption(boolean transportOption) {
+        isTransportOption = transportOption;
+    }
+
+    public boolean needsEarlyDeparture() {
+        return needsEarlyDeparture;
+    }
+
+    public void setNeedsEarlyDeparture(boolean needsEarlyDeparture) {
+        this.needsEarlyDeparture = needsEarlyDeparture;
+    }
+
     // Helper methods
     public void addTag(String tag) {
         if (this.tags == null) {
@@ -269,7 +296,29 @@ public class Activity {
         }
     }
 
-    @NonNull
+    /**
+     * Get early departure message for display
+     */
+    @SuppressLint("DefaultLocale")
+    public String getEarlyDepartureMessage() {
+        if (!needsEarlyDeparture || travelTimeFromPrevious <= 0 || timeSlot == null) {
+            return "";
+        }
+
+        try {
+            java.time.LocalTime activityStart = timeSlot.getStartTime();
+            if (activityStart == null) return "";
+
+            java.time.LocalTime departureTime = activityStart.minusMinutes(travelTimeFromPrevious);
+
+            return String.format("⚠️ Leave %d min early (Depart at %s)",
+                    travelTimeFromPrevious,
+                    departureTime.format(java.time.format.DateTimeFormatter.ofPattern("h:mm a")));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     @Override
     public String toString() {
         return "Activity{" +

@@ -53,11 +53,15 @@ public class Trip {
     }
 
     public List<Activity> getActivities() {
+        if (activities == null) {
+            activities = new ArrayList<>();
+        }
         return activities;
     }
 
     public void setActivities(List<Activity> activities) {
         this.activities = activities;
+        updateLastModified();
     }
 
     public List<SuggestedItinerary> getSuggestedItineraries() {
@@ -77,11 +81,20 @@ public class Trip {
     }
 
     public UserSelection getUserSelection() {
+        if (userSelection == null) {
+            // Initialize with default budget if metadata exists
+            if (metadata != null) {
+                userSelection = new UserSelection(metadata.getBudgetPerPerson());
+            } else {
+                userSelection = new UserSelection();
+            }
+        }
         return userSelection;
     }
 
     public void setUserSelection(UserSelection userSelection) {
         this.userSelection = userSelection;
+        updateLastModified();
     }
 
     public long getCreatedAt() {

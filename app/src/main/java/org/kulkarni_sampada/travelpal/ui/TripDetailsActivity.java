@@ -1,6 +1,5 @@
 package org.kulkarni_sampada.travelpal.ui;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -53,10 +52,19 @@ public class TripDetailsActivity extends AppCompatActivity {
         // Get trip ID from intent
         tripId = getIntent().getStringExtra("tripId");
 
-        if (tripId == null) {
-            Snackbar.make(findViewById(android.R.id.content), "Error: Trip ID not found", Snackbar.LENGTH_LONG).show();
-            finish();
-            return;
+        if (tripId == null || tripId.isEmpty()) {
+            // Try to get from current trip
+            viewModel = new ViewModelProvider(this).get(TripPlannerViewModel.class);
+            Trip currentTrip = viewModel.getCurrentTrip().getValue();
+            if (currentTrip != null) {
+                tripId = currentTrip.getTripId();
+            }
+
+            if (tripId == null || tripId.isEmpty()) {
+                Snackbar.make(findViewById(android.R.id.content), "Error: Trip ID not found", Snackbar.LENGTH_LONG).show();
+                finish();
+                return;
+            }
         }
 
         // Initialize ViewModel
@@ -122,7 +130,6 @@ public class TripDetailsActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void displayTripDetails(Trip trip) {
         if (trip == null || trip.getMetadata() == null) {
             return;
@@ -137,7 +144,6 @@ public class TripDetailsActivity extends AppCompatActivity {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
             Date date = inputFormat.parse(dateStr);
-            assert date != null;
             textDate.setText("📅 " + outputFormat.format(date));
         } catch (Exception e) {
             textDate.setText("📅 " + dateStr);

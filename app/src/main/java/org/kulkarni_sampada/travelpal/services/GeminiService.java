@@ -92,7 +92,14 @@ public class GeminiService {
     private String buildPrompt(TripMetadata metadata) {
         StringBuilder prompt = new StringBuilder();
 
-        prompt.append("You are a travel planning assistant. Generate a detailed day itinerary for a student trip.\n\n");
+        prompt.append("You are a travel planning assistant. Generate ONLY place/activity suggestions for a student trip.\n\n");
+
+        prompt.append("IMPORTANT RULES:\n");
+        prompt.append("1. Generate ONLY places to visit (museums, parks, landmarks, attractions)\n");
+        prompt.append("2. DO NOT suggest lunch, dinner, or meal options - we'll ask for those separately\n");
+        prompt.append("3. DO NOT suggest transportation or travel methods - we'll calculate those\n");
+        prompt.append("4. NO duplicate suggestions - each place should be unique\n");
+        prompt.append("5. Focus on activities that can be done during the time range provided\n\n");
 
         prompt.append("Trip Details:\n");
         prompt.append("- Destination: ").append(metadata.getDestination()).append("\n");
@@ -101,30 +108,23 @@ public class GeminiService {
                 .append(" to ").append(metadata.getTimeRange().getEnd()).append("\n");
         prompt.append("- Group Size: ").append(metadata.getGroupSize()).append(" people\n");
         prompt.append("- Budget Per Person: $").append(metadata.getBudgetPerPerson()).append("\n");
-        prompt.append("- Budget Includes Lunch: ").append(metadata.isBudgetIncludesLunch() ? "Yes" : "No").append("\n");
-        prompt.append("- Budget Includes Travel: ").append(metadata.isBudgetIncludesTravel() ? "Yes" : "No").append("\n");
-        prompt.append("- Transportation Mode: ").append(metadata.getTransportationMode().getDisplayName()).append("\n");
 
         if (metadata.getWeather() != null) {
             prompt.append("- Weather: ").append(metadata.getWeather().getFormattedWeather()).append("\n");
         }
 
-        prompt.append("\nGenerate 15-20 diverse activities suitable for students. ");
-        prompt.append("Include a mix of free and paid activities, cultural sites, outdoor activities, ");
-        prompt.append("food options, and entertainment. ");
+        prompt.append("\nGenerate 10-15 diverse PLACES TO VISIT suitable for students. ");
+        prompt.append("Include a mix of free and paid activities, cultural sites, outdoor activities, and entertainment. ");
+        prompt.append("Make sure activities fit within the time range and are appropriate for the weather.\n");
 
-        if (!metadata.isBudgetIncludesLunch()) {
-            prompt.append("Be sure to include lunch options. ");
-        }
-
-        prompt.append("\n\nIMPORTANT: Respond ONLY with valid JSON in the following format, with no markdown formatting, no ```json tags, and no additional text:\n\n");
+        prompt.append("\nIMPORTANT: Respond ONLY with valid JSON in the following format, with no markdown formatting, no ```json tags, and no additional text:\n\n");
 
         prompt.append("{\n");
         prompt.append("  \"activities\": [\n");
         prompt.append("    {\n");
         prompt.append("      \"id\": \"act_001\",\n");
-        prompt.append("      \"name\": \"Activity Name\",\n");
-        prompt.append("      \"category\": \"outdoor|cultural|food_lunch|food_dinner|entertainment|shopping|nightlife|relaxation\",\n");
+        prompt.append("      \"name\": \"Place/Activity Name\",\n");
+        prompt.append("      \"category\": \"outdoor|cultural|entertainment|relaxation\",\n");
         prompt.append("      \"description\": \"Brief description\",\n");
         prompt.append("      \"location\": {\n");
         prompt.append("        \"address\": \"Full address\",\n");
@@ -135,12 +135,12 @@ public class GeminiService {
         prompt.append("        \"suggestedStart\": \"HH:mm\",\n");
         prompt.append("        \"suggestedEnd\": \"HH:mm\",\n");
         prompt.append("        \"durationMinutes\": 0,\n");
-        prompt.append("        \"flexible\": true|false\n");
+        prompt.append("        \"flexible\": true\n");
         prompt.append("      },\n");
         prompt.append("      \"cost\": {\n");
         prompt.append("        \"amountPerPerson\": 0.0,\n");
         prompt.append("        \"currency\": \"USD\",\n");
-        prompt.append("        \"costType\": \"free|paid_entrance|meal|transportation|other\"\n");
+        prompt.append("        \"costType\": \"free|paid_entrance\"\n");
         prompt.append("      },\n");
         prompt.append("      \"tags\": [\"tag1\", \"tag2\"],\n");
         prompt.append("      \"weatherDependent\": true|false,\n");
@@ -281,6 +281,96 @@ public class GeminiService {
             public void onSuccess(GenerateContentResponse result) {
                 try {
                     List<Activity> activities = parseResponse(result.getText(), metadata);
+                    listener.onSuccess(activities);
+                } catch (JSONException e) {
+                    listener.onError("Failed to parse response: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                listener.onError("API call failed: " + t.getMessage());
+            }
+        }, executor);
+    }
+
+    /**
+     * Generate lunch options near a location at lunch time
+     */
+    public void generateLunchOptions(String destination, Location lastLocation,
+                                     Location nextLocation,
+                                     double budget, OnItineraryGeneratedListener listener) {
+        StringBuilder prompt = new StringBuilder();
+
+        prompt.append("Generate 5 lunch restaurant options for students in ").append(destination).append(".\n\n");
+        prompt.append("REQUIREMENTS:\n");
+        prompt.append("- Budget: Maximum $").append(budget).append(" per person\n");
+        prompt.append("- Must be located between or near these coordinates:\n");
+        if (lastLocation != null) {
+            prompt.append("  Last location: ").append(lastLocation.getLatitude()).append(", ").append(lastLocation.getLongitude()).append("\n");
+        }
+        if (nextLocation != null) {
+            prompt.append("  Next location: ").append(nextLocation.getLatitude()).append(", ").append(nextLocation.getLongitude()).append("\n");
+        }
+        prompt.append("- Student-friendly (casual, affordable)\n");
+        prompt.append("- Quick service (30-60 minutes)\n\n");
+
+        prompt.append("Return ONLY as JSON with category=\"food_lunch\" and costType=\"meal\"");
+
+        Content content = new Content.Builder()
+                .addText(prompt.toString())
+                .build();
+
+        ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+
+        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+            @Override
+            public void onSuccess(GenerateContentResponse result) {
+                try {
+                    List<Activity> activities = parseResponse(result.getText(), null);
+                    listener.onSuccess(activities);
+                } catch (JSONException e) {
+                    listener.onError("Failed to parse response: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                listener.onError("API call failed: " + t.getMessage());
+            }
+        }, executor);
+    }
+
+    /**
+     * Generate travel options between two locations
+     */
+    public void generateTravelOptions(Location from,
+                                      Location to,
+                                      TripMetadata.TransportMode preferredMode,
+                                      OnItineraryGeneratedListener listener) {
+        StringBuilder prompt = new StringBuilder();
+
+        prompt.append("Generate 2-3 transportation options between these locations:\n");
+        prompt.append("From: ").append(from.getAddress()).append(" (").append(from.getLatitude()).append(", ").append(from.getLongitude()).append(")\n");
+        prompt.append("To: ").append(to.getAddress()).append(" (").append(to.getLatitude()).append(", ").append(to.getLongitude()).append(")\n\n");
+        prompt.append("Preferred mode: ").append(preferredMode.getDisplayName()).append("\n\n");
+        prompt.append("Suggest options like:\n");
+        prompt.append("- Public transit (bus, metro, etc.) with estimated time and cost\n");
+        prompt.append("- Walking (if reasonable distance)\n");
+        prompt.append("- Rideshare (Uber/Lyft estimate)\n\n");
+        prompt.append("Return ONLY as JSON with category=\"transportation\" and costType=\"transportation\"");
+
+        Content content = new Content.Builder()
+                .addText(prompt.toString())
+                .build();
+
+        ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+
+        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+            @Override
+            public void onSuccess(GenerateContentResponse result) {
+                try {
+                    List<Activity> activities = parseResponse(result.getText(), null);
                     listener.onSuccess(activities);
                 } catch (JSONException e) {
                     listener.onError("Failed to parse response: " + e.getMessage());

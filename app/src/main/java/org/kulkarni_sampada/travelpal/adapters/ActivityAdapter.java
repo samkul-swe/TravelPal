@@ -20,7 +20,7 @@ import java.util.List;
 public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder> {
 
     private List<Activity> activities;
-    private final OnActivityActionListener listener;
+    private OnActivityActionListener listener;
 
     public interface OnActivityActionListener {
         void onActivitySelect(Activity activity);
@@ -79,6 +79,19 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         private TextView textState;
         private Button btnAction;
         private View layoutTravelTime;
+        private View layoutDescription;
+
+        // Tags (NEW)
+        private com.google.android.material.chip.Chip chipFood;
+        private com.google.android.material.chip.Chip chipTravel;
+        private com.google.android.material.chip.Chip chipPlace;
+        private com.google.android.material.chip.Chip chipFree;
+        private com.google.android.material.chip.Chip chipRecommended;
+
+        private View layoutEarlyWarning;
+        private TextView textEarlyWarning;
+
+        private boolean isExpanded = false;
 
         public ActivityViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,15 +106,28 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             textState = itemView.findViewById(R.id.textState);
             btnAction = itemView.findViewById(R.id.btnAction);
             layoutTravelTime = itemView.findViewById(R.id.layoutTravelTime);
+            layoutDescription = itemView.findViewById(R.id.layoutDescription);
+
+            // Initialize tags
+            chipFood = itemView.findViewById(R.id.chipFood);
+            chipTravel = itemView.findViewById(R.id.chipTravel);
+            chipPlace = itemView.findViewById(R.id.chipPlace);
+            chipFree = itemView.findViewById(R.id.chipFree);
+            chipRecommended = itemView.findViewById(R.id.chipRecommended);
+
+            layoutEarlyWarning = itemView.findViewById(R.id.layoutEarlyWarning);
+            textEarlyWarning = itemView.findViewById(R.id.textEarlyWarning);
         }
 
-        @SuppressLint("SetTextI18n")
         public void bind(Activity activity, OnActivityActionListener listener) {
             // Set basic info
             textName.setText(activity.getName());
             textCategory.setText(activity.getCategoryIcon() + " " +
                     activity.getCategory().getDisplayName());
             textDescription.setText(activity.getDescription());
+
+            // Set tags based on activity properties (NEW)
+            setTags(activity);
 
             // Set time slot
             if (activity.getTimeSlot() != null) {
@@ -131,6 +157,29 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             } else {
                 layoutTravelTime.setVisibility(View.GONE);
             }
+
+            // Show early departure warning if needed (NEW)
+            if (activity.needsEarlyDeparture()) {
+                layoutEarlyWarning.setVisibility(View.VISIBLE);
+                textEarlyWarning.setText(activity.getEarlyDepartureMessage());
+            } else {
+                layoutEarlyWarning.setVisibility(View.GONE);
+            }
+
+            // Initially hide description (NEW - expandable)
+            layoutDescription.setVisibility(View.GONE);
+            isExpanded = false;
+
+            // Click to expand/collapse description (NEW)
+            cardView.setOnClickListener(v -> {
+                if (isExpanded) {
+                    layoutDescription.setVisibility(View.GONE);
+                    isExpanded = false;
+                } else {
+                    layoutDescription.setVisibility(View.VISIBLE);
+                    isExpanded = true;
+                }
+            });
 
             // Set state and button based on activity state
             Activity.ActivityState state = activity.getState();
@@ -196,12 +245,56 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
                     break;
             }
 
-            // Show details on card click
-            cardView.setOnClickListener(v -> {
+            // Show details on long press (keep existing behavior)
+            cardView.setOnLongClickListener(v -> {
                 if (listener != null) {
                     listener.onActivityDetails(activity);
                 }
+                return true;
             });
+        }
+
+        /**
+         * Set tags based on activity properties (NEW)
+         */
+        @SuppressLint("SetTextI18n")
+        private void setTags(Activity activity) {
+            // Hide all tags initially
+            chipFood.setVisibility(View.GONE);
+            chipTravel.setVisibility(View.GONE);
+            chipPlace.setVisibility(View.GONE);
+            chipFree.setVisibility(View.GONE);
+
+            // Show Food tag if it's a food activity
+            if (activity.isFoodActivity()) {
+                chipFood.setVisibility(View.VISIBLE);
+            }
+
+            // Show Travel tag if transportation is involved
+            if (activity.getCost() != null &&
+                    activity.getCost().getCostType() == org.kulkarni_sampada.travelpal.models.Cost.CostType.TRANSPORTATION) {
+                chipTravel.setVisibility(View.VISIBLE);
+            }
+
+            // Show Place tag for cultural/outdoor/entertainment activities
+            Activity.ActivityCategory category = activity.getCategory();
+            if (category == Activity.ActivityCategory.CULTURAL ||
+                    category == Activity.ActivityCategory.OUTDOOR ||
+                    category == Activity.ActivityCategory.ENTERTAINMENT) {
+                chipPlace.setVisibility(View.VISIBLE);
+            }
+
+            // Show Free tag if activity is free
+            if (activity.isFree()) {
+                chipFree.setVisibility(View.VISIBLE);
+            }
+
+            // Show Recommended Experience tag if available (NEW)
+            if (activity.getRecommendedExperience() != null &&
+                    !activity.getRecommendedExperience().isEmpty()) {
+                chipRecommended.setVisibility(View.VISIBLE);
+                chipRecommended.setText("⭐ " + activity.getRecommendedExperience());
+            }
         }
     }
 }

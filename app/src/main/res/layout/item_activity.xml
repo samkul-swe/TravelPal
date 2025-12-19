@@ -65,29 +65,111 @@
 
         </LinearLayout>
 
-        <!-- Description -->
-        <TextView
-            android:id="@+id/textDescription"
+        <!-- Tags Section (NEW) -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            tools:text="Iconic bridge with stunning bay views. Perfect for the sunny weather!" />
+            app:chipSpacing="4dp">
 
-        <!-- Divider -->
-        <View
+            <!-- Food Tag -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFood"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="false"
+                android:text="🍽️ Food"
+                android:textSize="11sp"
+                android:visibility="gone"
+                app:chipBackgroundColor="#FFE0B2"
+                app:chipStrokeWidth="0dp" />
+
+            <!-- Travel Tag -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTravel"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="false"
+                android:text="🚇 Travel"
+                android:textSize="11sp"
+                android:visibility="gone"
+                app:chipBackgroundColor="#BBDEFB"
+                app:chipStrokeWidth="0dp" />
+
+            <!-- Place Tag -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPlace"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="false"
+                android:text="📍 Place"
+                android:textSize="11sp"
+                android:visibility="gone"
+                app:chipBackgroundColor="#C8E6C9"
+                app:chipStrokeWidth="0dp" />
+
+            <!-- Free Tag -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFree"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="false"
+                android:text="🆓 Free"
+                android:textSize="11sp"
+                android:visibility="gone"
+                app:chipBackgroundColor="#E1F5E1"
+                app:chipStrokeWidth="0dp" />
+
+            <!-- Recommended Experience Tag (NEW) -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipRecommended"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="false"
+                android:textSize="11sp"
+                android:visibility="gone"
+                app:chipBackgroundColor="#FFF9C4"
+                app:chipStrokeWidth="0dp"
+                tools:text="⭐ Best at sunset" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Expandable Description Section (NEW) -->
+        <LinearLayout
+            android:id="@+id/layoutDescription"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="12dp"
-            android:background="@color/divider" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
+
+            <TextView
+                android:id="@+id/textDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                tools:text="Iconic bridge with stunning bay views. Perfect for the sunny weather!" />
+
+        </LinearLayout>
 
         <!-- Details Grid -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:orientation="vertical">
 
             <TextView
@@ -136,6 +218,29 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     tools:text="🚇 15 min travel" />
+
+            </LinearLayout>
+
+            <!-- Early Departure Warning (NEW) -->
+            <LinearLayout
+                android:id="@+id/layoutEarlyWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/warning_background"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/textEarlyWarning"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/warning"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="⚠️ Leave 45 min early (Depart at 8:15 AM)" />
 
             </LinearLayout>
 
