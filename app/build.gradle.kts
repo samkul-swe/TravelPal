@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "org.kulkarni_sampada.travelpal"
-    compileSdk = 34
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -36,9 +36,62 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    packaging {
+        resources {
+            excludes += "META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/license.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/notice.txt"
+            excludes += "META-INF/ASL2.0"
+            excludes += "META-INF/*.kotlin_module"
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+        }
+    }
 }
 
 dependencies {
+    // AndroidX Core
+    implementation(libs.core)
+    implementation(libs.coordinatorlayout)
+    implementation(libs.cardview)
+    implementation(libs.recyclerview)
+
+    // Lifecycle Components (ViewModel, LiveData)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+    implementation(libs.lifecycle.runtime)
+    implementation(libs.lifecycle.extensions)
+
+    // Firebase BOM (Bill of Materials)
+    implementation(platform(libs.firebase.bom.v3270))
+    implementation(libs.google.firebase.auth)
+    implementation(libs.google.firebase.database)
+    implementation(libs.firebase.analytics)
+
+    // Gemini AI (Google Generative AI)
+    implementation(libs.generativeai.v012)
+    implementation(libs.guava.v3350android)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
+
+    // Networking - Volley for HTTP requests
+    implementation(libs.volley)
+
+    // Google Play Services - Maps and Location
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location.v2110)
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.junit.v115)
+    androidTestImplementation(libs.espresso.core.v351)
+
+
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -47,7 +100,6 @@ dependencies {
     implementation(libs.espresso.web)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.retrofit2.retrofit)
@@ -60,7 +112,6 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.picasso)
     implementation(libs.firebase.storage)
-    implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
     implementation(libs.generativeai)
     implementation(libs.material.v130alpha02)

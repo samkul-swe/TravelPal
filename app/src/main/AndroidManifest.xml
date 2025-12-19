@@ -2,12 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,21 +16,66 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TravelPal"
+        android:theme="@style/AppTheme"
         tools:targetApi="31">
+
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDRMW38lIVLQJJF2iqd0o-Y3buIc0xoPFI" />
+
+        <!-- Main Activity (Trip List) -->
         <activity
-            android:name=".PlaceRecommendationActivity"
-            android:exported="false"
-            android:theme="@style/Theme.TravelPal" />
+            android:name=".ui.MainActivity"
+            android:exported="false" />
+
+        <!-- Login Activity (Entry Point) -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".ui.LoginActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Signup Activity -->
+        <activity
+            android:name=".ui.SignupActivity"
+            android:exported="false"
+            android:label="Sign Up" />
+
+        <!-- Trip Setup Activity -->
+        <activity
+            android:name=".ui.TripSetupActivity"
+            android:exported="false"
+            android:label="Plan Your Trip" />
+
+        <!-- Trip Planning Activity -->
+        <activity
+            android:name=".ui.TripPlanningActivity"
+            android:exported="false"
+            android:label="Select Activities" />
+
+        <!-- Trip Details Activity -->
+        <activity
+            android:name=".ui.TripDetailsActivity"
+            android:exported="false"
+            android:label="Trip Details" />
+
+        <!-- Profile Activity -->
+        <activity
+            android:name=".ui.ProfileActivity"
+            android:exported="false"
+            android:label="Profile" />
+
+        <!-- Shared Trips Activity -->
+        <activity
+            android:name=".ui.SharedTripsActivity"
+            android:exported="false"
+            android:label="Shared Trips" />
+
     </application>
 
 </manifest>

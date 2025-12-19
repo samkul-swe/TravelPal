@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_profile"
+        android:icon="@drawable/ic_person"
+        android:title="@string/menu_profile"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_shared_trips"
+        android:icon="@drawable/ic_group"
+        android:title="@string/menu_shared_trips"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/menu_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="@string/menu_logout"
+        app:showAsAction="never" />
+
+</menu>

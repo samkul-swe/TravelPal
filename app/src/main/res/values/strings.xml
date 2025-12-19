@@ -1,115 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Name -->
     <string name="app_name">TravelPal</string>
-    <string name="welcome_to_travelpal">Welcome to TravelPal!</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="login">Login</string>
-    <string name="enter_name">Name</string>
-    <string name="enter_email">Email ID</string>
-    <string name="enter_password">Password</string>
-    <string name="select_your_interests">Select your interests</string>
+
+    <!-- Common Actions -->
     <string name="save">Save</string>
-    <string name="start_date">Start Date</string>
-    <string name="end_date">End Date</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="continue_text">Continue</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Authentication -->
+    <string name="login">Login</string>
+    <string name="signup">Sign Up</string>
+    <string name="logout">Logout</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="no_account">Don\'t have an account?</string>
+    <string name="have_account">Already have an account?</string>
+
+    <!-- Trip Setup -->
+    <string name="plan_your_trip">Plan Your Trip</string>
+    <string name="destination">Destination</string>
+    <string name="where_to_go">Where do you want to go?</string>
+    <string name="select_date">Select Date</string>
+    <string name="no_date_selected">No date selected</string>
     <string name="start_time">Start Time</string>
     <string name="end_time">End Time</string>
-    <string name="event_price">Price</string>
-    <string name="event_location">Location</string>
-    <string name="add">Add</string>
-    <string name="event_register_link">Register Link</string>
-    <string name="create_event">Create Event</string>
-    <string name="event_description">Description</string>
-    <string name="selected_image">Selected Image</string>
-    <string name="select_image">Select Image</string>
-    <string name="art">Art</string>
-    <string name="nature">Nature</string>
-    <string name="photography">Photography</string>
-    <string name="travel">Travel</string>
-    <string name="music">Music</string>
-    <string name="movies">Movies</string>
-    <string name="food">Food</string>
-    <string name="sports">Sports</string>
-    <string name="right_now">Right Now</string>
-    <string name="explore">Explore</string>
-    <string name="register_event">Register Event</string>
-    <string name="item_image">Image</string>
-    <string name="trip_budget">Trip Budget</string>
-    <string name="enter_your_budget">Enter your budget</string>
-    <string name="traveling_as">Traveling As</string>
-    <string name="solo">Solo</string>
-    <string name="group_of_2">Group of 2</string>
-    <string name="group_of_3">Group of 3</string>
-    <string name="budget_includes">Budget Includes</string>
-    <string name="meals">Meals</string>
-    <string name="submit">Submit</string>
-    <string name="minimumBudget">$0</string>
-    <string name="maximumBudget">$5000</string>
-    <string name="plan_a_trip">Plan a travel</string>
-    <string name="planned_trips">Planned Trips</string>
-    <string name="destination">Destination</string>
-    <string name="duration">Duration</string>
-    <string name="meals_included">Meals Included</string>
-    <string name="register">Register</string>
-    <string name="search">Search</string>
-    <string name="show_location">Show Location</string>
-    <string name="confirm_selection">Confirm Selection</string>
-    <string name="user_profile">User Profile</string>
-    <string name="total_budget">Total Budget</string>
-    <string name="per_person_budget">Per person budget</string>
-    <string name="budget_amount">Amount</string>
-    <string name="title_home">Home</string>
-    <string name="title_budget">Budget</string>
-    <string name="title_profile">Profile</string>
-    <string name="place_recommendation">Place Recommendation</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="lorem_ipsum">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
-        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
-        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
-        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
-        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
-        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
-        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
-        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
-        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
-        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
-        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
-        bibendum, vel congue leo egestas.\n\n
-        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
-        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
-        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
-        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
-        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
-        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
-        est.\n\n
-        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
-        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
-        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
-        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
-        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
-        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
-        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
-        convallis.\n\n
-        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
-        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
-        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
-        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
-        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
-        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
-        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
-    </string>
-    <string name="occasion">Occasion</string>
-    <string name="location">Location</string>
+    <string name="not_set">Not set</string>
+    <string name="group_size">Group Size</string>
+    <string name="how_many_people">How many people?</string>
     <string name="budget">Budget</string>
-    <string name="date">Date</string>
-    <string name="select_date">Select Date</string>
-    <string name="weather">Weather</string>
-    <string name="enter_location">Enter Location</string>
-    <string name="use_current_location">Use Current Location</string>
-    <string name="get_weather">Get Weather</string>
-    <string name="enter_date_yyyy_mm_dd">Enter date (yyyy-MM-dd)</string>
+    <string name="budget_per_person">Budget (per person)</string>
+    <string name="budget_in_usd">Budget in USD</string>
+    <string name="include_lunch">Budget includes lunch</string>
+    <string name="include_travel">Budget includes travel/transportation</string>
+    <string name="transport_mode">Transportation Mode</string>
+
+    <!-- Trip List -->
+    <string name="my_trips">My Trips</string>
+    <string name="no_trips">No trips</string>
+    <string name="no_trips_yet">No trips yet</string>
+    <string name="create_first_trip">Create your first trip to start exploring!</string>
+    <string name="create_new_trip">Create New Trip</string>
+    <string name="edit_trip">Edit Trip</string>
+    <string name="delete_trip">Delete Trip</string>
+    <string name="delete_trip_confirm">Are you sure you want to delete this trip?</string>
+    <string name="trip_deleted">Trip deleted successfully</string>
+
+    <!-- Activity Planning -->
+    <string name="select_activities">Select Activities</string>
+    <string name="budget_remaining">Budget remaining</string>
+    <string name="budget_spent">Budget spent</string>
+    <string name="activities_selected">activities selected</string>
+    <string name="add_activity">Add</string>
+    <string name="remove_activity">Remove</string>
+    <string name="activity_unavailable">Unavailable</string>
+    <string name="time_conflict">Time Conflict</string>
+    <string name="over_budget">Over Budget</string>
+    <string name="selected">Selected</string>
+    <string name="save_trip">Save Trip</string>
+    <string name="trip_saved">Trip saved successfully!</string>
+
+    <!-- Activity Categories -->
+    <string name="category_outdoor">Outdoor</string>
+    <string name="category_cultural">Cultural</string>
+    <string name="category_food">Food</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_nightlife">Nightlife</string>
+    <string name="category_relaxation">Relaxation</string>
+
+    <!-- Filters -->
+    <string name="all">All</string>
+    <string name="free">Free</string>
+    <string name="filter_outdoor">🏞️ Outdoor</string>
+    <string name="filter_cultural">🏛️ Cultural</string>
+    <string name="filter_food">🍽️ Food</string>
+    <string name="filter_free">🆓 Free</string>
+
+    <!-- Error Messages -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_authentication">Authentication failed. Please try again.</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+    <string name="error_invalid_password">Password must be at least 6 characters</string>
+    <string name="error_required_field">This field is required</string>
+
+    <!-- Success Messages -->
+    <string name="success_login">Welcome back!</string>
+    <string name="success_signup">Account created successfully!</string>
+    <string name="success_logout">Logged out successfully</string>
+
+    <!-- Loading Messages -->
+    <string name="loading">Loading…</string>
+    <string name="generating_itinerary">Generating your itinerary…</string>
+    <string name="calculating_travel_time">Calculating travel time…</string>
+
+    <!-- Menu Items -->
+    <string name="menu_profile">Profile</string>
+    <string name="menu_shared_trips">Shared Trips</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_logout">Logout</string>
+
+    <!-- Content Descriptions (for accessibility) -->
+    <string name="cd_app_logo">TravelPal logo</string>
+    <string name="cd_user_avatar">User avatar</string>
+    <string name="cd_activity_image">Activity image</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_back_button">Back</string>
 </resources>
