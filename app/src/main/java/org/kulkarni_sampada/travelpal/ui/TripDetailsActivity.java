@@ -1,7 +1,9 @@
 package org.kulkarni_sampada.travelpal.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -82,6 +84,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         }
 
         // Load trip
+        Log.d("TripDetailsActivity", "Loading trip with ID: " + tripId);
         viewModel.loadTrip(tripId);
     }
 
@@ -106,7 +109,14 @@ public class TripDetailsActivity extends AppCompatActivity {
 
     private void setupObservers() {
         // Observe current trip
-        viewModel.getCurrentTrip().observe(this, this::displayTripDetails);
+        viewModel.getCurrentTrip().observe(this, trip -> {
+            Log.d("TripDetailsActivity", "Trip received: " + (trip != null ? trip.getTripId() : "null"));
+            if (trip != null) {
+                displayTripDetails(trip);
+            } else {
+                Snackbar.make(btnEditTrip, "Failed to load trip", Snackbar.LENGTH_LONG).show();
+            }
+        });
 
         // Observe loading state
         viewModel.getIsLoading().observe(this, isLoading -> {
@@ -130,8 +140,15 @@ public class TripDetailsActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private void displayTripDetails(Trip trip) {
-        if (trip == null || trip.getMetadata() == null) {
+        if (trip == null) {
+            Snackbar.make(btnEditTrip, "Trip data not found", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        if (trip.getMetadata() == null) {
+            Snackbar.make(btnEditTrip, "Trip metadata not found", Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -140,13 +157,17 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         // Display date
         String dateStr = trip.getMetadata().getDate();
-        try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            SimpleDateFormat outputFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
-            Date date = inputFormat.parse(dateStr);
-            textDate.setText("📅 " + outputFormat.format(date));
-        } catch (Exception e) {
-            textDate.setText("📅 " + dateStr);
+        if (dateStr != null) {
+            try {
+                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat outputFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
+                Date date = inputFormat.parse(dateStr);
+                if (date != null) {
+                    textDate.setText("📅 " + outputFormat.format(date));
+                }
+            } catch (Exception e) {
+                textDate.setText("📅 " + dateStr);
+            }
         }
 
         // Display time range
@@ -158,58 +179,78 @@ public class TripDetailsActivity extends AppCompatActivity {
         textGroupSize.setText("👥 " + trip.getMetadata().getGroupSize() + " people");
 
         // Display budget
-        textBudget.setText("💰 $" + String.format("%.2f", trip.getMetadata().getBudgetPerPerson()) + "/person");
+        textBudget.setText("💰 $" + String.format(Locale.getDefault(), "%.2f", trip.getMetadata().getBudgetPerPerson()) + "/person");
 
         // Display budget summary
         if (trip.getUserSelection() != null) {
-            textBudgetSpent.setText("$" + String.format("%.2f", trip.getUserSelection().getTotalCostPerPerson()));
-            textBudgetRemaining.setText("$" + String.format("%.2f", trip.getUserSelection().getRemainingBudget()));
+            textBudgetSpent.setText("$" + String.format(Locale.getDefault(), "%.2f", trip.getUserSelection().getTotalCostPerPerson()));
+            textBudgetRemaining.setText("$" + String.format(Locale.getDefault(), "%.2f", trip.getUserSelection().getRemainingBudget()));
+        } else {
+            textBudgetSpent.setText("$0.00");
+            textBudgetRemaining.setText("$" + String.format(Locale.getDefault(), "%.2f", trip.getMetadata().getBudgetPerPerson()));
         }
 
         // Display selected activities
-        if (trip.getUserSelection() != null && trip.getActivities() != null) {
-            List<Activity> selectedActivities = new ArrayList<>();
+        List<Activity> selectedActivities = new ArrayList<>();
+        if (trip.getUserSelection() != null && trip.getUserSelection().getSelectedActivityIds() != null) {
             for (String activityId : trip.getUserSelection().getSelectedActivityIds()) {
                 Activity activity = trip.getActivityById(activityId);
                 if (activity != null) {
                     selectedActivities.add(activity);
                 }
             }
-
-            // Set adapter with selected activities
-            ActivityAdapter adapter = new ActivityAdapter(selectedActivities, new ActivityAdapter.OnActivityActionListener() {
-                @Override
-                public void onActivitySelect(Activity activity) {
-                    // View only - no selection
-                }
-
-                @Override
-                public void onActivityDeselect(Activity activity) {
-                    // View only - no deselection
-                }
-
-                @Override
-                public void onActivityDetails(Activity activity) {
-                    Snackbar.make(btnEditTrip, activity.getName(), Snackbar.LENGTH_SHORT).show();
-                }
-            });
-            recyclerViewItinerary.setAdapter(adapter);
         }
+
+        // Set adapter with selected activities (read-only view)
+        ActivityAdapter adapter = new ActivityAdapter(selectedActivities, new ActivityAdapter.OnActivityActionListener() {
+            @Override
+            public void onActivitySelect(Activity activity) {
+                // View only - no selection
+            }
+
+            @Override
+            public void onActivityDeselect(Activity activity) {
+                // View only - no deselection
+            }
+
+            @Override
+            public void onActivityDetails(Activity activity) {
+                // Show details
+                Snackbar.make(btnEditTrip, activity.getDescription(), Snackbar.LENGTH_LONG).show();
+            }
+        });
+        recyclerViewItinerary.setAdapter(adapter);
     }
 
     private void setupButtons() {
         btnEditTrip.setOnClickListener(v -> {
+            if (tripId == null || tripId.isEmpty()) {
+                Snackbar.make(v, "Cannot edit: Trip ID missing", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(this, TripPlanningActivity.class);
             intent.putExtra("tripId", tripId);
+            intent.putExtra("isEditing", true);
             startActivity(intent);
         });
 
         btnShareTrip.setOnClickListener(v -> {
-            // TODO: Implement trip sharing
-            Snackbar.make(v, "Sharing feature coming soon!", Snackbar.LENGTH_SHORT).show();
+            if (tripId == null || tripId.isEmpty()) {
+                Snackbar.make(v, "Cannot share: Trip ID missing", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+
+            ShareTripDialog dialog = ShareTripDialog.newInstance(tripId);
+            dialog.show(getSupportFragmentManager(), "share_trip");
         });
 
         btnMarkCompleted.setOnClickListener(v -> {
+            if (tripId == null || tripId.isEmpty()) {
+                Snackbar.make(v, "Cannot update: Trip ID missing", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+
             // TODO: Implement mark as completed
             Snackbar.make(v, "Trip marked as completed!", Snackbar.LENGTH_SHORT).show();
             finish();

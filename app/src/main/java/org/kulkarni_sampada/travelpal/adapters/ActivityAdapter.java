@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
+
 import org.kulkarni_sampada.travelpal.R;
 import org.kulkarni_sampada.travelpal.models.Activity;
 
@@ -20,7 +22,7 @@ import java.util.List;
 public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder> {
 
     private List<Activity> activities;
-    private OnActivityActionListener listener;
+    private final OnActivityActionListener listener;
 
     public interface OnActivityActionListener {
         void onActivitySelect(Activity activity);
@@ -68,28 +70,28 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
     }
 
     static class ActivityViewHolder extends RecyclerView.ViewHolder {
-        private CardView cardView;
-        private TextView textName;
-        private TextView textCategory;
-        private TextView textDescription;
-        private TextView textTimeSlot;
-        private TextView textCost;
-        private TextView textLocation;
-        private TextView textTravelTime;
-        private TextView textState;
-        private Button btnAction;
-        private View layoutTravelTime;
-        private View layoutDescription;
+        private final CardView cardView;
+        private final TextView textName;
+        private final TextView textCategory;
+        private final TextView textDescription;
+        private final TextView textTimeSlot;
+        private final TextView textCost;
+        private final TextView textLocation;
+        private final TextView textTravelTime;
+        private final TextView textState;
+        private final Button btnAction;
+        private final View layoutTravelTime;
+        private final View layoutDescription;
 
         // Tags (NEW)
-        private com.google.android.material.chip.Chip chipFood;
-        private com.google.android.material.chip.Chip chipTravel;
-        private com.google.android.material.chip.Chip chipPlace;
-        private com.google.android.material.chip.Chip chipFree;
-        private com.google.android.material.chip.Chip chipRecommended;
+        private final Chip chipFood;
+        private final Chip chipTravel;
+        private final Chip chipPlace;
+        private final Chip chipFree;
+        private final Chip chipRecommended;
 
-        private View layoutEarlyWarning;
-        private TextView textEarlyWarning;
+        private final View layoutEarlyWarning;
+        private final TextView textEarlyWarning;
 
         private boolean isExpanded = false;
 
@@ -119,6 +121,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             textEarlyWarning = itemView.findViewById(R.id.textEarlyWarning);
         }
 
+        @SuppressLint("SetTextI18n")
         public void bind(Activity activity, OnActivityActionListener listener) {
             // Set basic info
             textName.setText(activity.getName());

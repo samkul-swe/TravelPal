@@ -112,6 +112,14 @@ public class TripPlanningActivity extends AppCompatActivity {
     private void initializeTripFromIntent() {
         Intent intent = getIntent();
 
+        // Check if we're editing an existing trip
+        if (intent.hasExtra("tripId")) {
+            String tripId = intent.getStringExtra("tripId");
+            viewModel.loadTrip(tripId);
+            return;
+        }
+
+        // Otherwise, create new trip from passed data
         if (intent.hasExtra("destination")) {
             // Get all data from intent
             String destination = intent.getStringExtra("destination");
@@ -259,7 +267,7 @@ public class TripPlanningActivity extends AppCompatActivity {
         adapter.updateActivities(filteredActivities);
     }
 
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void setupObservers() {
         // Observe current trip
         viewModel.getCurrentTrip().observe(this, trip -> {
@@ -329,18 +337,34 @@ public class TripPlanningActivity extends AppCompatActivity {
 
     private void setupFab() {
         fabSaveTrip.setOnClickListener(v -> {
+            Trip trip = viewModel.getCurrentTrip().getValue();
+            if (trip == null) {
+                Snackbar.make(v, "No trip to save", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Save the trip
             viewModel.saveTrip();
 
-            // Navigate to trip details
-            Snackbar.make(v, "Trip saved! Redirecting...", Snackbar.LENGTH_SHORT).show();
+            // Show saving message
+            Snackbar.make(v, "Saving trip...", Snackbar.LENGTH_SHORT).show();
 
-            // Wait a moment then navigate
-            v.postDelayed(() -> {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-            }, 1500);
+            // Wait for save to complete, then navigate
+            viewModel.getSuccessMessage().observe(this, message -> {
+                if (message != null && message.contains("saved")) {
+                    v.postDelayed(() -> {
+                        // Get the saved trip with ID
+                        Trip savedTrip = viewModel.getCurrentTrip().getValue();
+                        if (savedTrip != null && savedTrip.getTripId() != null) {
+                            // Navigate to main activity
+                            Intent intent = new Intent(this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }, 1000);
+                }
+            });
         });
     }
 
@@ -409,7 +433,7 @@ public class TripPlanningActivity extends AppCompatActivity {
         try {
             java.text.SimpleDateFormat sdf24 = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
             java.text.SimpleDateFormat sdf12 = new java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault());
-            return sdf12.format(sdf24.parse(time24));
+            return sdf12.format(Objects.requireNonNull(sdf24.parse(time24)));
         } catch (Exception e) {
             return time24;
         }

@@ -34,13 +34,13 @@ public class TripPlannerViewModel extends AndroidViewModel {
     private final Handler mainHandler; // For posting to main thread
 
     // LiveData
-    private MutableLiveData<Trip> currentTrip;
-    private MutableLiveData<List<Activity>> availableActivities;
-    private MutableLiveData<UserSelection> userSelection;
-    private MutableLiveData<Map<String, Activity.ActivityState>> activityStates;
-    private MutableLiveData<Boolean> isLoading;
-    private MutableLiveData<String> errorMessage;
-    private MutableLiveData<String> successMessage;
+    private final MutableLiveData<Trip> currentTrip;
+    private final MutableLiveData<List<Activity>> availableActivities;
+    private final MutableLiveData<UserSelection> userSelection;
+    private final MutableLiveData<Map<String, Activity.ActivityState>> activityStates;
+    private final MutableLiveData<Boolean> isLoading;
+    private final MutableLiveData<String> errorMessage;
+    private final MutableLiveData<String> successMessage;
 
     public TripPlannerViewModel(@NonNull Application application) {
         super(application);
@@ -352,26 +352,35 @@ public class TripPlannerViewModel extends AndroidViewModel {
         Trip trip = currentTrip.getValue();
 
         if (trip == null) {
-            errorMessage.setValue("No trip to save");
+            mainHandler.post(() -> errorMessage.setValue("No trip to save"));
             return;
         }
 
-        isLoading.setValue(true);
+        if (trip.getMetadata() == null) {
+            mainHandler.post(() -> errorMessage.setValue("Trip metadata missing"));
+            return;
+        }
+
+        mainHandler.post(() -> isLoading.setValue(true));
 
         tripRepository.saveTrip(trip, new TripRepository.OnTripSavedListener() {
             @Override
             public void onSuccess(Trip savedTrip) {
-                isLoading.setValue(false);
-                currentTrip.setValue(savedTrip);
-                successMessage.setValue("Trip saved successfully!");
-                Log.d(TAG, "Trip saved: " + savedTrip.getTripId());
+                mainHandler.post(() -> {
+                    isLoading.setValue(false);
+                    currentTrip.setValue(savedTrip);
+                    successMessage.setValue("Trip saved successfully!");
+                    Log.d(TAG, "Trip saved with ID: " + savedTrip.getTripId());
+                });
             }
 
             @Override
             public void onError(String error) {
-                isLoading.setValue(false);
-                errorMessage.setValue("Failed to save trip: " + error);
-                Log.e(TAG, "Failed to save trip", new Exception(error));
+                mainHandler.post(() -> {
+                    isLoading.setValue(false);
+                    errorMessage.setValue("Failed to save trip: " + error);
+                    Log.e(TAG, "Failed to save trip", new Exception(error));
+                });
             }
         });
     }

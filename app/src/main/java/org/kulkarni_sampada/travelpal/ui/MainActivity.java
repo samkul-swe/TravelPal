@@ -23,7 +23,6 @@ import org.kulkarni_sampada.travelpal.viewmodel.TripListViewModel;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = "MainActivity";
 
     private AuthViewModel authViewModel;
@@ -139,14 +138,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openTripDetails(Trip trip) {
+        if (trip == null || trip.getTripId() == null) {
+            Snackbar.make(recyclerView, "Error: Trip ID not found", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent intent = new Intent(this, TripDetailsActivity.class);
         intent.putExtra("tripId", trip.getTripId());
         startActivity(intent);
     }
 
     private void editTrip(Trip trip) {
+        if (trip == null || trip.getTripId() == null) {
+            Snackbar.make(recyclerView, "Error: Trip ID not found", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent intent = new Intent(this, TripPlanningActivity.class);
         intent.putExtra("tripId", trip.getTripId());
+        intent.putExtra("isEditing", true);
         startActivity(intent);
     }
 
