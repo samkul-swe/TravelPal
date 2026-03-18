@@ -22,11 +22,11 @@
 
             <!-- Logo/Icon -->
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_travel_logo"
-                app:tint="@color/primary" />
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="fitCenter" />
 
             <!-- App Name -->
             <TextView
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/app_name"
-                android:textColor="@color/primary"
+                android:textColor="#1341A0"
                 android:textSize="32sp"
                 android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
                 android:text="Your Budget-Friendly Travel Planner"
                 android:textAlignment="center"
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textSize="20sp" />
 
             <!-- Email Input -->
             <com.google.android.material.textfield.TextInputLayout

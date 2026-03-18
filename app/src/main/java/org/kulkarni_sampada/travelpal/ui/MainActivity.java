@@ -2,10 +2,12 @@ package org.kulkarni_sampada.travelpal.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,14 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-
 import org.kulkarni_sampada.travelpal.R;
-import org.kulkarni_sampada.travelpal.adapters.TripListAdapter;
 import org.kulkarni_sampada.travelpal.models.Trip;
+import org.kulkarni_sampada.travelpal.adapters.TripListAdapter;
 import org.kulkarni_sampada.travelpal.viewmodel.AuthViewModel;
 import org.kulkarni_sampada.travelpal.viewmodel.TripListViewModel;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -31,6 +33,35 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TripListAdapter adapter;
     private FloatingActionButton fabNewTrip;
+    private View layoutEmptyState;
+    private TextView textEmptyTitle;
+    private TextView textEmptyMessage;
+    private TextView textEmptyCta;
+
+    // Quirky rotating messages
+    private final String[] emptyStateTitles = {
+            "✈️ Your Adventure Awaits!",
+            "🤝 Ready to Plan Together?",
+            "🗺️ No Pins on Your Map Yet!",
+            "📍 Your Itinerary is Lonely",
+            "🎒 Every Journey Starts Somewhere"
+    };
+
+    private final String[] emptyStateMessages = {
+            "No trips yet? That's like having a passport\nwith no stamps!",
+            "Great adventures start with great planning.\nAnd great planning is better with friends!",
+            "Your travel bucket list is looking\na little... empty",
+            "It's so quiet here, even the crickets\nleft for vacation",
+            "And yours starts right here,\nright now"
+    };
+
+    private final String[] emptyStateCtas = {
+            "Let's fix that!",
+            "Your squad is waiting!",
+            "Time to fill it with adventures!",
+            "Let's plan something epic!",
+            "Ready to explore?"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
     private void initializeViews() {
         recyclerView = findViewById(R.id.recyclerViewTrips);
         fabNewTrip = findViewById(R.id.fabNewTrip);
+        layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        textEmptyTitle = findViewById(R.id.textEmptyTitle);
+        textEmptyCta = findViewById(R.id.textEmptyCta);
+        textEmptyMessage = findViewById(R.id.textEmptyMessage);
 
         setSupportActionBar(findViewById(R.id.toolbar));
         if (getSupportActionBar() != null) {
@@ -102,6 +137,21 @@ public class MainActivity extends AppCompatActivity {
         tripListViewModel.getTrips().observe(this, trips -> {
             if (trips != null) {
                 adapter.updateTrips(trips);
+
+                // Show/hide empty state (with null check)
+                if (layoutEmptyState != null) {
+                    if (trips.isEmpty()) {
+                        // Set random quirky message
+                        setRandomEmptyStateMessage();
+
+                        layoutEmptyState.setVisibility(android.view.View.VISIBLE);
+                        recyclerView.setVisibility(android.view.View.GONE);
+                        fabNewTrip.setVisibility(android.view.View.GONE);
+                    } else {
+                        layoutEmptyState.setVisibility(android.view.View.GONE);
+                        recyclerView.setVisibility(android.view.View.VISIBLE);
+                    }
+                }
             }
         });
 
@@ -130,6 +180,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupFab() {
         fabNewTrip.setOnClickListener(v -> createNewTrip());
+
+        // Also setup empty state button (with null check)
+        android.view.View btnCreateFirst = findViewById(R.id.btnCreateFirstTrip);
+        if (btnCreateFirst != null) {
+            btnCreateFirst.setOnClickListener(v -> createNewTrip());
+        }
     }
 
     private void createNewTrip() {
@@ -214,5 +270,12 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    private void setRandomEmptyStateMessage() {
+        int randomIndex = new Random().nextInt(emptyStateTitles.length);
+        textEmptyTitle.setText(emptyStateTitles[randomIndex]);
+        textEmptyMessage.setText(emptyStateMessages[randomIndex]);
+        textEmptyCta.setText(emptyStateCtas[randomIndex]);
     }
 }

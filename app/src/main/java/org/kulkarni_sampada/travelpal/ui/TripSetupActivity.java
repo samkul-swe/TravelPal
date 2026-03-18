@@ -39,7 +39,6 @@ public class TripSetupActivity extends AppCompatActivity {
     private EditText editBudget;
     private CheckBox checkIncludeLunch;
     private CheckBox checkIncludeTravel;
-    private Spinner spinnerTransportMode;
     private Button btnSelectDate;
     private Button btnSelectStartTime;
     private Button btnSelectEndTime;
@@ -60,7 +59,6 @@ public class TripSetupActivity extends AppCompatActivity {
 
         // Initialize UI
         initializeViews();
-        setupSpinner();
         setupDatePicker();
         setupTimePickers();
         setupObservers();
@@ -80,7 +78,6 @@ public class TripSetupActivity extends AppCompatActivity {
         editBudget = findViewById(R.id.editBudget);
         checkIncludeLunch = findViewById(R.id.checkIncludeLunch);
         checkIncludeTravel = findViewById(R.id.checkIncludeTravel);
-        spinnerTransportMode = findViewById(R.id.spinnerTransportMode);
         btnSelectDate = findViewById(R.id.btnSelectDate);
         btnSelectStartTime = findViewById(R.id.btnSelectStartTime);
         btnSelectEndTime = findViewById(R.id.btnSelectEndTime);
@@ -91,23 +88,6 @@ public class TripSetupActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Plan Your Trip");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    private void setupSpinner() {
-        String[] transportModes = {
-                "Public Transit",
-                "Driving",
-                "Walking",
-                "Cycling"
-        };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                transportModes
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTransportMode.setAdapter(adapter);
     }
 
     private void setupDatePicker() {
@@ -259,26 +239,6 @@ public class TripSetupActivity extends AppCompatActivity {
         boolean includeLunch = checkIncludeLunch.isChecked();
         boolean includeTravel = checkIncludeTravel.isChecked();
 
-        // Get transport mode
-        TripMetadata.TransportMode transportMode;
-        int selectedPosition = spinnerTransportMode.getSelectedItemPosition();
-        switch (selectedPosition) {
-            case 0:
-                transportMode = TripMetadata.TransportMode.PUBLIC_TRANSIT;
-                break;
-            case 1:
-                transportMode = TripMetadata.TransportMode.DRIVING;
-                break;
-            case 2:
-                transportMode = TripMetadata.TransportMode.WALKING;
-                break;
-            case 3:
-                transportMode = TripMetadata.TransportMode.CYCLING;
-                break;
-            default:
-                transportMode = TripMetadata.TransportMode.PUBLIC_TRANSIT;
-        }
-
         // Navigate to trip planning activity with data
         Intent intent = new Intent(this, TripPlanningActivity.class);
         intent.putExtra("destination", destination);
@@ -289,7 +249,6 @@ public class TripSetupActivity extends AppCompatActivity {
         intent.putExtra("budget", budget);
         intent.putExtra("includeLunch", includeLunch);
         intent.putExtra("includeTravel", includeTravel);
-        intent.putExtra("transportMode", transportMode.getValue());
         startActivity(intent);
     }
 

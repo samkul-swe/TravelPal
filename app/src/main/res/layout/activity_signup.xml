@@ -25,8 +25,8 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_travel_logo"
-                app:tint="@color/primary" />
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="fitCenter" />
 
             <!-- App Name -->
             <TextView

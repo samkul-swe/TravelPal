@@ -1,7 +1,5 @@
 package org.kulkarni_sampada.travelpal.models;
 
-import android.annotation.SuppressLint;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +20,7 @@ public class Activity {
     private Accessibility accessibility;
     private List<String> dietaryOptions;
     private String recommendedExperience; // e.g., "Best at sunset", "Book in advance"
+    private String groupBenefit; // e.g., "Group discount 20%", "Group tours available"
     private boolean isTransportOption; // True if this is a travel option between places
 
     // State management (not stored in Firebase, calculated dynamically)
@@ -251,6 +250,18 @@ public class Activity {
         this.needsEarlyDeparture = needsEarlyDeparture;
     }
 
+    public String getGroupBenefit() {
+        return groupBenefit;
+    }
+
+    public void setGroupBenefit(String groupBenefit) {
+        this.groupBenefit = groupBenefit;
+    }
+
+    public boolean hasGroupBenefit() {
+        return groupBenefit != null && !groupBenefit.isEmpty();
+    }
+
     // Helper methods
     public void addTag(String tag) {
         if (this.tags == null) {
@@ -299,7 +310,6 @@ public class Activity {
     /**
      * Get early departure message for display
      */
-    @SuppressLint("DefaultLocale")
     public String getEarlyDepartureMessage() {
         if (!needsEarlyDeparture || travelTimeFromPrevious <= 0 || timeSlot == null) {
             return "";

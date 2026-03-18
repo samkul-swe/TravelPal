@@ -43,7 +43,7 @@ public class GeminiService {
     public static synchronized GeminiService getInstance() {
         if (instance == null) {
             // TODO: Replace with your actual API key or load from BuildConfig
-            String apiKey = "AIzaSyB6BsxYOncomlc3nr29RwCz3s5xmYT3J6Q";
+            String apiKey = "AIzaSyD1offrd0xpislzV9EC6Pvvt9KQgklP--A";
             instance = new GeminiService(apiKey);
         }
         return instance;
@@ -87,24 +87,26 @@ public class GeminiService {
     }
 
     /**
-     * Build prompt for Gemini
+     * Build prompt for Gemini - Time-based activity suggestions
      */
     private String buildPrompt(TripMetadata metadata) {
         StringBuilder prompt = new StringBuilder();
 
-        prompt.append("You are a travel planning assistant. Generate ONLY place/activity suggestions for a student trip.\n\n");
+        prompt.append("You are a travel planning assistant. Generate activity suggestions for a day trip.\n\n");
 
-        prompt.append("IMPORTANT RULES:\n");
-        prompt.append("1. Generate ONLY places to visit (museums, parks, landmarks, attractions)\n");
-        prompt.append("2. DO NOT suggest lunch, dinner, or meal options - we'll ask for those separately\n");
-        prompt.append("3. DO NOT suggest transportation or travel methods - we'll calculate those\n");
-        prompt.append("4. NO duplicate suggestions - each place should be unique\n");
-        prompt.append("5. Focus on activities that can be done during the time range provided\n\n");
+        prompt.append("CRITICAL REQUIREMENTS:\n");
+        prompt.append("1. Generate activities ONLY for places to visit (museums, parks, landmarks, attractions, viewpoints)\n");
+        prompt.append("2. DO NOT include food, lunch, dinner, or restaurants\n");
+        prompt.append("3. DO NOT include transportation or travel methods\n");
+        prompt.append("4. NO duplicate suggestions\n");
+        prompt.append("5. SORT activities chronologically by suggested start time\n");
+        prompt.append("6. Activities must fit within the time range: ").append(metadata.getTimeRange().getStart())
+                .append(" to ").append(metadata.getTimeRange().getEnd()).append("\n\n");
 
         prompt.append("Trip Details:\n");
         prompt.append("- Destination: ").append(metadata.getDestination()).append("\n");
         prompt.append("- Date: ").append(metadata.getDate()).append("\n");
-        prompt.append("- Time Available: ").append(metadata.getTimeRange().getStart())
+        prompt.append("- Time Range: ").append(metadata.getTimeRange().getStart())
                 .append(" to ").append(metadata.getTimeRange().getEnd()).append("\n");
         prompt.append("- Group Size: ").append(metadata.getGroupSize()).append(" people\n");
         prompt.append("- Budget Per Person: $").append(metadata.getBudgetPerPerson()).append("\n");
@@ -113,42 +115,54 @@ public class GeminiService {
             prompt.append("- Weather: ").append(metadata.getWeather().getFormattedWeather()).append("\n");
         }
 
-        prompt.append("\nGenerate 10-15 diverse PLACES TO VISIT suitable for students. ");
-        prompt.append("Include a mix of free and paid activities, cultural sites, outdoor activities, and entertainment. ");
-        prompt.append("Make sure activities fit within the time range and are appropriate for the weather.\n");
+        prompt.append("\nGENERATE 12-15 activities with these requirements:\n");
+        prompt.append("- Each activity must have a specific suggested start and end time\n");
+        prompt.append("- Times should be spread throughout the day (").append(metadata.getTimeRange().getStart())
+                .append(" to ").append(metadata.getTimeRange().getEnd()).append(")\n");
+        prompt.append("- Include both popular attractions AND hidden gems\n");
+        prompt.append("- Mix of free and paid activities\n");
+        prompt.append("- Mention if there are GROUP DISCOUNTS available\n");
+        prompt.append("- Mention if activity is GROUP-ONLY or better with a group\n");
+        prompt.append("- Add 'recommendedExperience' field for special tips (e.g., 'Best at sunset', 'Book in advance', 'Less crowded in morning')\n");
+        prompt.append("- Consider the weather when suggesting outdoor vs indoor activities\n\n");
 
-        prompt.append("\nIMPORTANT: Respond ONLY with valid JSON in the following format, with no markdown formatting, no ```json tags, and no additional text:\n\n");
+        prompt.append("RESPOND ONLY with valid JSON (no markdown, no ```json tags):\n\n");
 
         prompt.append("{\n");
         prompt.append("  \"activities\": [\n");
         prompt.append("    {\n");
         prompt.append("      \"id\": \"act_001\",\n");
-        prompt.append("      \"name\": \"Place/Activity Name\",\n");
-        prompt.append("      \"category\": \"outdoor|cultural|entertainment|relaxation\",\n");
+        prompt.append("      \"name\": \"Activity Name\",\n");
+        prompt.append("      \"category\": \"outdoor|cultural|entertainment|relaxation|shopping\",\n");
         prompt.append("      \"description\": \"Brief description\",\n");
         prompt.append("      \"location\": {\n");
-        prompt.append("        \"address\": \"Full address\",\n");
+        prompt.append("        \"address\": \"Full address with city\",\n");
         prompt.append("        \"latitude\": 0.0,\n");
         prompt.append("        \"longitude\": 0.0\n");
         prompt.append("      },\n");
         prompt.append("      \"timeSlot\": {\n");
-        prompt.append("        \"suggestedStart\": \"HH:mm\",\n");
-        prompt.append("        \"suggestedEnd\": \"HH:mm\",\n");
-        prompt.append("        \"durationMinutes\": 0,\n");
-        prompt.append("        \"flexible\": true\n");
+        prompt.append("        \"suggestedStart\": \"HH:mm\" (24-hour format),\n");
+        prompt.append("        \"suggestedEnd\": \"HH:mm\" (24-hour format),\n");
+        prompt.append("        \"durationMinutes\": calculated duration,\n");
+        prompt.append("        \"flexible\": true if time is flexible, false if fixed\n");
         prompt.append("      },\n");
         prompt.append("      \"cost\": {\n");
-        prompt.append("        \"amountPerPerson\": 0.0,\n");
+        prompt.append("        \"amountPerPerson\": price per person,\n");
         prompt.append("        \"currency\": \"USD\",\n");
-        prompt.append("        \"costType\": \"free|paid_entrance\"\n");
+        prompt.append("        \"costType\": \"free|paid_entrance\",\n");
+        prompt.append("        \"notes\": \"Group discount available\" or \"Better price for groups\" if applicable\n");
         prompt.append("      },\n");
-        prompt.append("      \"tags\": [\"tag1\", \"tag2\"],\n");
-        prompt.append("      \"weatherDependent\": true|false,\n");
-        prompt.append("      \"bookingRequired\": true|false,\n");
-        prompt.append("      \"studentDiscountAvailable\": true|false\n");
+        prompt.append("      \"tags\": [\"popular\", \"hidden_gem\", \"photo_spot\", etc.],\n");
+        prompt.append("      \"weatherDependent\": true if outdoor,\n");
+        prompt.append("      \"bookingRequired\": true if tickets needed,\n");
+        prompt.append("      \"studentDiscountAvailable\": true|false,\n");
+        prompt.append("      \"recommendedExperience\": \"Best at sunset\" or \"Book 2 weeks ahead\" or \"Less crowded mornings\" etc.,\n");
+        prompt.append("      \"groupBenefit\": \"Group discount 20% for 3+ people\" or \"Group tours available\" if applicable\n");
         prompt.append("    }\n");
         prompt.append("  ]\n");
-        prompt.append("}\n");
+        prompt.append("}\n\n");
+
+        prompt.append("IMPORTANT: Sort activities by suggestedStart time (earliest first)!");
 
         return prompt.toString();
     }
@@ -248,6 +262,14 @@ public class GeminiService {
 
         if (json.has("studentDiscountAmount")) {
             activity.setStudentDiscountAmount(json.getDouble("studentDiscountAmount"));
+        }
+
+        if (json.has("recommendedExperience")) {
+            activity.setRecommendedExperience(json.getString("recommendedExperience"));
+        }
+
+        if (json.has("groupBenefit")) {
+            activity.setGroupBenefit(json.getString("groupBenefit"));
         }
 
         // Set initial state

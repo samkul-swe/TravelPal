@@ -233,23 +233,6 @@
                 android:text="Budget includes travel/transportation"
                 android:textColor="@color/text_primary" />
 
-            <!-- Transportation Mode -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="🚇 Transportation Mode"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <Spinner
-                android:id="@+id/spinnerTransportMode"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/spinner_background" />
-
             <!-- Continue Button -->
             <Button
                 android:id="@+id/btnContinue"

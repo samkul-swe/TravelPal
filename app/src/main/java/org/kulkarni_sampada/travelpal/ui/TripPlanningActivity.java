@@ -1,6 +1,5 @@
 package org.kulkarni_sampada.travelpal.ui;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,10 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-
 import org.kulkarni_sampada.travelpal.R;
-import org.kulkarni_sampada.travelpal.adapters.ActivityAdapter;
 import org.kulkarni_sampada.travelpal.models.Activity;
+import org.kulkarni_sampada.travelpal.adapters.ActivityAdapter;
 import org.kulkarni_sampada.travelpal.models.TimeRange;
 import org.kulkarni_sampada.travelpal.models.Trip;
 import org.kulkarni_sampada.travelpal.models.TripMetadata;
@@ -27,7 +25,6 @@ import org.kulkarni_sampada.travelpal.viewmodel.TripPlannerViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class TripPlanningActivity extends AppCompatActivity {
 
@@ -182,11 +179,20 @@ public class TripPlanningActivity extends AppCompatActivity {
             @Override
             public void onActivitySelect(Activity activity) {
                 viewModel.selectActivity(activity);
+
+                // Remove selected activity from list
+                removeActivityFromList(activity);
+
+                // Check if we need travel or lunch options
+                checkAndGenerateDynamicOptions(activity);
             }
 
             @Override
             public void onActivityDeselect(Activity activity) {
                 viewModel.deselectActivity(activity);
+
+                // Add activity back to list
+                addActivityBackToList(activity);
             }
 
             @Override
@@ -201,6 +207,139 @@ public class TripPlanningActivity extends AppCompatActivity {
 
         // Setup filter listeners
         setupFilters();
+    }
+
+    /**
+     * Remove activities that overlap with selected activity's time slot
+     */
+    private void removeActivityFromList(Activity selectedActivity) {
+        if (selectedActivity == null || selectedActivity.getTimeSlot() == null) return;
+
+        List<Activity> currentList = new ArrayList<>(allActivities);
+        List<Activity> filtered = new ArrayList<>();
+
+        for (Activity activity : currentList) {
+            // Keep if it's the selected activity or if it doesn't overlap
+            if (activity.getId().equals(selectedActivity.getId())) {
+                continue; // Remove selected activity
+            }
+
+            // Remove if time slots overlap
+            if (activity.getTimeSlot() != null &&
+                    activity.getTimeSlot().overlapsWith(selectedActivity.getTimeSlot())) {
+                continue; // Skip overlapping activities
+            }
+
+            filtered.add(activity);
+        }
+
+        allActivities = filtered;
+        adapter.updateActivities(filtered);
+    }
+
+    /**
+     * Add activity back when deselected
+     */
+    private void addActivityBackToList(Activity activity) {
+        if (!allActivities.contains(activity)) {
+            allActivities.add(activity);
+            // Re-sort by time
+            sortActivitiesByTime();
+            adapter.updateActivities(allActivities);
+        }
+    }
+
+    /**
+     * Sort activities by start time
+     */
+    private void sortActivitiesByTime() {
+        allActivities.sort((a1, a2) -> {
+            if (a1.getTimeSlot() == null || a2.getTimeSlot() == null) return 0;
+            String time1 = a1.getTimeSlot().getSuggestedStart();
+            String time2 = a2.getTimeSlot().getSuggestedStart();
+            if (time1 == null || time2 == null) return 0;
+            return time1.compareTo(time2);
+        });
+    }
+
+    /**
+     * Check if we need to generate travel or lunch options after selection
+     */
+    private void checkAndGenerateDynamicOptions(Activity selectedActivity) {
+        org.kulkarni_sampada.travelpal.models.UserSelection selection = viewModel.getUserSelection().getValue();
+        if (selection == null) return;
+
+        // If user has at least 2 activities, suggest travel between them
+        if (selection.getSelectionCount() >= 2) {
+            // Get last two selected activities
+            List<String> selectedIds = selection.getSelectedActivityIds();
+            if (selectedIds.size() >= 2) {
+                String prevId = selectedIds.get(selectedIds.size() - 2);
+                String currentId = selectedIds.get(selectedIds.size() - 1);
+
+                Activity prevActivity = viewModel.getActivityById(prevId);
+                Activity currentActivity = viewModel.getActivityById(currentId);
+
+                if (prevActivity != null && currentActivity != null) {
+                    // Generate travel options
+                    generateTravelOptionsBetween(prevActivity, currentActivity);
+                }
+            }
+        }
+
+        // Check if activity ends during lunch time (11:30 AM - 2:30 PM)
+        if (selectedActivity.getTimeSlot() != null) {
+            String endTime = selectedActivity.getTimeSlot().getSuggestedEnd();
+            if (isLunchTime(endTime)) {
+                showLunchSuggestionBanner(selectedActivity.getLocation());
+            }
+        }
+    }
+
+    /**
+     * Check if time is during lunch hours
+     */
+    private boolean isLunchTime(String time) {
+        try {
+            java.time.LocalTime t = java.time.LocalTime.parse(time);
+            java.time.LocalTime lunchStart = java.time.LocalTime.parse("11:30");
+            java.time.LocalTime lunchEnd = java.time.LocalTime.parse("14:30");
+            return !t.isBefore(lunchStart) && !t.isAfter(lunchEnd);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Generate travel options between two activities
+     */
+    private void generateTravelOptionsBetween(Activity from, Activity to) {
+        layoutDynamicSuggestions.setVisibility(View.VISIBLE);
+        textSuggestionTitle.setText("🚇 How will you get there?");
+        textSuggestionSubtitle.setText(String.format("From %s to %s",
+                from.getLocation().getShortAddress(),
+                to.getLocation().getShortAddress()));
+
+        // TODO: Call Gemini to generate travel options
+        layoutDynamicSuggestions.setOnClickListener(v -> {
+            Snackbar.make(v, "Generating travel options...", Snackbar.LENGTH_SHORT).show();
+            // viewModel.generateTravelOptions(from.getLocation(), to.getLocation());
+        });
+    }
+
+    /**
+     * Show lunch suggestion banner near a location
+     */
+    private void showLunchSuggestionBanner(org.kulkarni_sampada.travelpal.models.Location nearLocation) {
+        layoutDynamicSuggestions.setVisibility(View.VISIBLE);
+        textSuggestionTitle.setText("🍽️ Lunch time! Hungry?");
+        textSuggestionSubtitle.setText("We'll find lunch spots near " + nearLocation.getShortAddress());
+
+        // TODO: Generate lunch options
+        layoutDynamicSuggestions.setOnClickListener(v -> {
+            Snackbar.make(v, "Generating lunch options...", Snackbar.LENGTH_SHORT).show();
+            // viewModel.generateLunchOptions(nearLocation);
+        });
     }
 
     /**
@@ -267,7 +406,6 @@ public class TripPlanningActivity extends AppCompatActivity {
         adapter.updateActivities(filteredActivities);
     }
 
-    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void setupObservers() {
         // Observe current trip
         viewModel.getCurrentTrip().observe(this, trip -> {
@@ -382,7 +520,6 @@ public class TripPlanningActivity extends AppCompatActivity {
     /**
      * Update the timeline display showing how much time is planned
      */
-    @SuppressLint("SetTextI18n")
     private void updateTimelineDisplay(org.kulkarni_sampada.travelpal.models.UserSelection selection) {
         org.kulkarni_sampada.travelpal.models.Trip trip = viewModel.getCurrentTrip().getValue();
         if (trip == null || trip.getMetadata() == null || trip.getMetadata().getTimeRange() == null) {
@@ -413,9 +550,9 @@ public class TripPlanningActivity extends AppCompatActivity {
     private int calculateTimeProgress(String start, String current, String end) {
         try {
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
-            long startMs = Objects.requireNonNull(sdf.parse(start)).getTime();
-            long currentMs = Objects.requireNonNull(sdf.parse(current)).getTime();
-            long endMs = Objects.requireNonNull(sdf.parse(end)).getTime();
+            long startMs = sdf.parse(start).getTime();
+            long currentMs = sdf.parse(current).getTime();
+            long endMs = sdf.parse(end).getTime();
 
             long totalDuration = endMs - startMs;
             long elapsed = currentMs - startMs;
@@ -433,7 +570,7 @@ public class TripPlanningActivity extends AppCompatActivity {
         try {
             java.text.SimpleDateFormat sdf24 = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
             java.text.SimpleDateFormat sdf12 = new java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault());
-            return sdf12.format(Objects.requireNonNull(sdf24.parse(time24)));
+            return sdf12.format(sdf24.parse(time24));
         } catch (Exception e) {
             return time24;
         }
@@ -452,7 +589,6 @@ public class TripPlanningActivity extends AppCompatActivity {
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
             java.util.Date currentTime = sdf.parse(selection.getCurrentEndTime());
             java.util.Calendar cal = java.util.Calendar.getInstance();
-            assert currentTime != null;
             cal.setTime(currentTime);
             int hour = cal.get(java.util.Calendar.HOUR_OF_DAY);
 
@@ -471,7 +607,6 @@ public class TripPlanningActivity extends AppCompatActivity {
     /**
      * Show lunch suggestion banner
      */
-    @SuppressLint("SetTextI18n")
     private void showLunchSuggestion() {
         layoutDynamicSuggestions.setVisibility(View.VISIBLE);
         textSuggestionTitle.setText("🍽️ Lunch time! Looking for nearby options?");
